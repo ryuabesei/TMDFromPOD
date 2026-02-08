@@ -1,76 +1,82 @@
-# =========================
-# Swarm DNSPOD データの
-# 軌道平均密度（density_orbitmean）を
-# 時系列で可視化する簡単なプロット
-# =========================
-
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
 
-# -------------------------
-# 1. parquet ファイルの読み込み
-# -------------------------
-# integrateddata/swarm_dnscpod_2018.parquet は、
-# すでに CDF から読み込んで前処理した Swarm の密度データ
-# index は UTC の DatetimeIndex になっている想定
-df = pd.read_parquet("integrateddata/swarm_dnsbpod_2018.parquet")
-
+# =========================
+# 入力データ
+# =========================
+PARQUET = "normalizeddata/swarm_dnscpod_2018_normalized.parquet"
 
 # -------------------------
-# 2. figure 
+# データ読み込み
 # -------------------------
+df = pd.read_parquet(PARQUET)
+df["datetime"] = pd.to_datetime(df["datetime"], utc=True)
+
+# -------------------------
+# 期間抽出（2018/02/05 ～ 2018/02/20）
+# -------------------------
+t_start = pd.Timestamp("2018-02-05 00:00:00", tz="UTC")
+t_end   = pd.Timestamp("2018-02-20 23:59:59", tz="UTC")
+
+df = df[(df["datetime"] >= t_start) & (df["datetime"] <= t_end)].copy()
+
+# -------------------------
+# Day of Year（連続値）
+# -------------------------
+dt = df["datetime"]
+df["DOY"] = (
+    dt.dt.dayofyear
+    + dt.dt.hour / 24.0
+    + dt.dt.minute / 1440.0
+    + dt.dt.second / 86400.0
+)
+
+# =========================
+# 1日平均を計算
+# =========================
+# 日付（UTC日）でグループ化
+daily = (
+    df
+    .groupby(df["datetime"].dt.floor("D"))
+    .agg(
+        density_mean=("density_norm", "mean"),
+        density_median=("density_norm", "median")
+    )
+)
+
+# 日平均用の DOY（その日の中央 = +0.5）
+daily["DOY"] = daily.index.dayofyear + 0.5
+
+# =========================
+# プロット
+# =========================
 plt.figure(figsize=(12, 4))
 
+# --- 元データ（30秒サンプル） ---
+plt.plot(
+    df["DOY"],
+    df["density_norm"],
+    lw=0.6,
+    alpha=0.3,
+    label="30-s samples"
+)
 
-# -------------------------
-# 3. 密度の時系列プロット
-# -------------------------
-# x軸：観測時刻（df.index）
-# y軸：軌道平均密度 density_orbitmean
-# lw=0.8 で線を細めにして、点が多くても潰れにくくする
-plt.plot(df.index, df["density_orbitmean"], lw=0.8)
+# --- 1日平均（太線） ---
+plt.plot(
+    daily["DOY"],
+    daily["density_mean"],
+    marker="o",
+    lw=2.5,
+    label="Daily mean"
+)
 
-
-# -------------------------
-# 4. y軸を対数スケールに変更
-# -------------------------
-# 熱圏密度は数桁オーダーで変動するため、
-# logスケールの方が変動構造を見やすい
 plt.yscale("log")
+plt.xlabel("Day of Year (2018)")
+plt.ylabel("Normalized density [kg m$^{-3}$]")
+plt.title("Swarm-C normalized thermospheric density\n2018-02-05 to 2018-02-20")
 
-
-# -------------------------
-# 5. グリッド線を追加
-# -------------------------
-# alpha=0.3 で薄く表示し、データの邪魔をしないようにする
 plt.grid(alpha=0.3)
-
-
-# -------------------------
-# 6. 軸ラベルの設定
-# -------------------------
-# x軸：UTC時刻
-# y軸：密度（単位はDNSCPOD仕様に依存、ここでは kg/m^3 表記）
-plt.xlabel("UTC")
-plt.ylabel("Density [kg/m³]")
-
-
-# -------------------------
-# 7. 図のタイトル
-# -------------------------
-# 「LT や緯度でのフィルタを一切していない」
-# 生データに近い軌道平均密度の時系列であることを明示
-plt.title("Swarm-B density (orbit-mean, no LT / no latitude filtering)")
-
-
-# -------------------------
-# 8. レイアウト調整
-# -------------------------
-# ラベルやタイトルが図からはみ出さないように自動調整
+plt.legend()
 plt.tight_layout()
-
-
-# -------------------------
-# 9. 図を画面に表示
-# -------------------------
 plt.show()
