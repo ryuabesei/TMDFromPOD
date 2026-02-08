@@ -67,7 +67,7 @@ def read_swarm_dnscpod(path: str) -> pd.DataFrame:
 # - concat で縦結合して時系列データにする
 # - 同一時刻が重複していたら1つにする（keep="first"）
 # =========================
-def collect_cdfs(data_dir="data/SWARM_B", pattern="SW_OPER_DNSBPOD_2__*.cdf") -> pd.DataFrame:
+def collect_cdfs(data_dir="data/SWARM_B", pattern="SW_OPER_DNSCPOD_2__*.cdf") -> pd.DataFrame:
     # ディレクトリ内のCDFファイルを列挙（ファイル名順）
     files = sorted(Path(data_dir).glob(pattern))
 
@@ -102,7 +102,7 @@ def collect_cdfs(data_dir="data/SWARM_B", pattern="SW_OPER_DNSBPOD_2__*.cdf") ->
 # - 先頭を表示して、期間とサンプル数を確認
 # - parquet に保存して後続解析（プロット等）を高速化
 # =========================
-all_df = collect_cdfs(data_dir="data/SWARM_B")
+all_df = collect_cdfs(data_dir="data/SWARM_C")
 
 # 読み込み結果の先頭5行を表示
 print(all_df.head(), "\n")
@@ -112,5 +112,5 @@ print(all_df.index.min(), "->", all_df.index.max(), "N=", len(all_df))
 
 # ---- 保存（おすすめ：parquet） ----
 # parquet は高速・軽量で、後の解析に便利
-all_df.to_parquet("integrateddata/swarm_dnsbpod_2018.parquet")
-print("Saved: integrateddata/swarm_dnsbpod_2018.parquet")
+all_df.to_parquet("integrateddata/swarm_dnscpod_2018.parquet")
+print("Saved: integrateddata/swarm_dnscpod_2018.parquet")
