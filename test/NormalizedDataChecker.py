@@ -1,8 +1,8 @@
 import pandas as pd
 import numpy as np
 
-NORM = "normalizeddata/swarm_dnscpod_2018_normalized.parquet"
-RAW  = "integrateddata/swarm_dnscpod_2018.parquet"
+NORM = "normalizeddata/swarm_dnsbpod_2018_normalized.parquet"
+RAW  = "integrateddata/swarm_dnsbpod_2018.parquet"
 
 df = pd.read_parquet(NORM)
 raw = pd.read_parquet(RAW)
