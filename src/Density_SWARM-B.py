@@ -7,8 +7,8 @@ T_START = "2018-02-05 00:00:00"
 T_END   = "2018-02-20 23:59:59"
 
 # セクター
-SECTOR_LEFT  = (1, 5)     # 07–09
-SECTOR_RIGHT = (13, 16)   # 18–21
+SECTOR_LEFT  = (1, 3)     # 07–09
+SECTOR_RIGHT = (13, 15)   # 18–21
 
 LAT_MIN, LAT_MAX = -60, 60
 DOY_BIN = 0.5

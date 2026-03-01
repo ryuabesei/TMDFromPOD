@@ -8,7 +8,7 @@ T_END   = "2018-02-20 23:59:59"
 
 # セクター（あなたが今使っている設定に合わせる）
 SECTOR_LEFT  = (7, 9)     # 07–09
-SECTOR_RIGHT = (18, 21)   # 18–21
+SECTOR_RIGHT = (19, 21)   # 18–21
 
 LAT_MIN, LAT_MAX = -60, 60
 DOY_BIN = 0.5

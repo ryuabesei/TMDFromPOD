@@ -18,11 +18,11 @@ FILES = {
     "SWARM-C": "normalizeddata/swarm_dnscpod_2018_normalized.parquet",
 }
 
-REP_DATES = ["2018-02-08", "2018-02-11", "2018-02-13", "2018-02-15"]
+REP_DATES = ["2018-02-08", "2018-02-11", "2018-02-13", "2018-02-15" ,"2018-02-17", "2018-02-19"]
 
 LAT_RANGE = (-60, 60)
 LAT_BIN = 2.0
-LT_WINDOW = (7, 9)   # Afternoon sector
+LT_WINDOW = (1, 3)   # Afternoon sector
 
 OUTPUT_DIR = Path("figures")
 OUTPUT_DIR.mkdir(exist_ok=True)
@@ -89,7 +89,7 @@ for sat, fp in FILES.items():
                 lw=2,
                 label=d)
 
-    ax.set_title(f"{sat} Afternoon (16–18 LT)")
+    ax.set_title(f"{sat} Afternoon (01–03 LT)")
     ax.set_xlabel("Geographic Latitude [deg]")
     ax.set_ylabel("Normalized Density [kg m$^{-3}$]")
     ax.grid(alpha=0.3)
