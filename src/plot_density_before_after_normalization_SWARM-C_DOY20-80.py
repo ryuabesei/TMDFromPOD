@@ -1,5 +1,5 @@
 """
-plot_density_before_after_normalization.py
+plot_density_before_after_normalization_SWARM-C_DOY20-80.py
 
 目的:
     正規化前（integrateddata/swarm_dnscpod_2018_DOY20-80.parquet）と
@@ -24,23 +24,23 @@ from pathlib import Path
 # =========================
 # 設定
 # =========================
-RAW_PARQUET = Path("integrateddata/swarm_dnscpod_2018_DOY20-80.parquet")
+RAW_PARQUET  = Path("integrateddata/swarm_dnscpod_2018_DOY20-80.parquet")
 NORM_PARQUET = Path("normalizeddata/swarm_dnscpod_2018_normalized_DOY20-80.parquet")
-OUT_PNG = Path("Figure/swarm_dnscpod_2018_before_after_normalization_DOY20-80.png")
+OUT_PNG      = Path("Figure/swarm_dnscpod_2018_before_after_normalization_DOY20-80_LT7-9_19-21.png")
 
 T_START = "2018-01-20 00:00:00"
-T_END = "2018-03-21 23:59:59"
+T_END   = "2018-03-21 23:59:59"
 
 SECTOR_MORNING = (7, 9)      # 07–09 LT
-SECTOR_EVENING = (19, 21)    # 18–21 LT
+SECTOR_EVENING = (19, 21)    # 19–21 LT
 
 LAT_MIN, LAT_MAX = -60, 60
 
-DOY_BIN = 0.5
-LAT_BIN = 3.0
+DOY_BIN  = 0.5
+LAT_BIN  = 3.0
 N_LEVELS = 20
 
-RAW_COL = "density"
+RAW_COL  = "density"
 NORM_COL = "density_norm"
 
 
@@ -220,27 +220,27 @@ def main() -> None:
     if len(df_raw) == 0 or len(df_norm) == 0:
         raise ValueError("対象期間のデータが空です。")
 
-    doy_all = np.concatenate([df_raw["DOY"].to_numpy(), df_norm["DOY"].to_numpy()])
+    doy_all  = np.concatenate([df_raw["DOY"].to_numpy(), df_norm["DOY"].to_numpy()])
     doy_bins = np.arange(np.floor(np.nanmin(doy_all)), np.ceil(np.nanmax(doy_all)) + DOY_BIN, DOY_BIN)
     lat_bins = np.arange(LAT_MIN, LAT_MAX + LAT_BIN, LAT_BIN)
 
-    df_raw_m, df_raw_e = split_sectors(df_raw)
+    df_raw_m,  df_raw_e  = split_sectors(df_raw)
     df_norm_m, df_norm_e = split_sectors(df_norm)
 
     print(f"  RAW  morning={len(df_raw_m):,}, evening={len(df_raw_e):,}")
     print(f"  NORM morning={len(df_norm_m):,}, evening={len(df_norm_e):,}")
 
     Z = {
-        "raw_m": grid_median(df_raw_m, doy_bins, lat_bins, "density_value"),
-        "raw_e": grid_median(df_raw_e, doy_bins, lat_bins, "density_value"),
+        "raw_m":  grid_median(df_raw_m,  doy_bins, lat_bins, "density_value"),
+        "raw_e":  grid_median(df_raw_e,  doy_bins, lat_bins, "density_value"),
         "norm_m": grid_median(df_norm_m, doy_bins, lat_bins, "density_value"),
         "norm_e": grid_median(df_norm_e, doy_bins, lat_bins, "density_value"),
     }
 
-    vmin_raw, vmax_raw = row_vmin_vmax(Z["raw_m"], Z["raw_e"])
+    vmin_raw,  vmax_raw  = row_vmin_vmax(Z["raw_m"],  Z["raw_e"])
     vmin_norm, vmax_norm = row_vmin_vmax(Z["norm_m"], Z["norm_e"])
 
-    levels_raw = make_levels(vmin_raw, vmax_raw, N_LEVELS)
+    levels_raw  = make_levels(vmin_raw,  vmax_raw,  N_LEVELS)
     levels_norm = make_levels(vmin_norm, vmax_norm, N_LEVELS)
 
     X, Y = make_mesh_from_bins(doy_bins, lat_bins)
@@ -268,8 +268,8 @@ def main() -> None:
     ]
 
     df_lookup = {
-        "raw_m": df_raw_m,
-        "raw_e": df_raw_e,
+        "raw_m":  df_raw_m,
+        "raw_e":  df_raw_e,
         "norm_m": df_norm_m,
         "norm_e": df_norm_e,
     }
@@ -288,7 +288,7 @@ def main() -> None:
         cf_lookup[(row, col)] = cf
 
         ax.set_title(title, fontsize=11)
-        ax.set_xlabel("Day of Year (2018)", fontsize=10)
+        ax.set_xlabel("Day of Year 2018 (DOY 20–80)", fontsize=10)
         ax.set_ylim(LAT_MIN, LAT_MAX)
         ax.set_xlim(doy_bins[0], doy_bins[-2] + DOY_BIN)
         ax.grid(alpha=0.2, color="white", linewidth=0.5)
@@ -313,14 +313,14 @@ def main() -> None:
             df_lookup[key],
             lt_min=lt_min,
             lt_max=lt_max,
-            stat="median",   # 参考図寄りなら median 推奨
+            stat="median",
         )
         if len(x_lt) > 0:
             ax_r.plot(x_lt, y_lt, color="k", lw=1.0)
 
         ax.axvspan(36, 45, color="white", alpha=0.10, lw=0)
 
-    cb_ax_raw = fig.add_subplot(gs[0, 2])
+    cb_ax_raw  = fig.add_subplot(gs[0, 2])
     cb_ax_norm = fig.add_subplot(gs[1, 2])
 
     fig.colorbar(cf_lookup[(0, 1)], cax=cb_ax_raw).set_label(

@@ -1,9 +1,9 @@
 """
-plot_density_before_after_normalization.py
+plot_density_before_after_normalization_SWARM-B_DOY20-80.py
 
 目的:
-    正規化前（integrateddata/swarm_dnsapod_2018_DOY20-80.parquet）と
-    正規化後（normalizeddata/swarm_dnsapod_2018_normalized_DOY20-80.parquet）の
+    正規化前（integrateddata/swarm_dnsbpod_2018_DOY20-80.parquet）と
+    正規化後（normalizeddata/swarm_dnsbpod_2018_normalized_DOY20-80.parquet）の
     2D密度分布（緯度 × DoY）を左右に並べて比較する。
 
 参考図に合わせた点:
@@ -24,23 +24,24 @@ from pathlib import Path
 # =========================
 # 設定
 # =========================
-RAW_PARQUET = Path("integrateddata/swarm_dnsapod_2018_DOY20-80.parquet")
-NORM_PARQUET = Path("normalizeddata/swarm_dnsapod_2018_normalized_DOY20-80.parquet")
-OUT_PNG = Path("Figure/swarm_dnsapod_2018_before_after_normalization_DOY20-80_LT7-9_18-21.png")
+RAW_PARQUET  = Path("integrateddata/swarm_dnsbpod_2018_DOY20-80.parquet")
+NORM_PARQUET = Path("normalizeddata/swarm_dnsbpod_2018_normalized_DOY20-80.parquet")
+OUT_PNG      = Path("Figure/swarm_dnsbpod_2018_before_after_normalization_DOY20-80_LT22-5_11-17.png")
 
 T_START = "2018-01-20 00:00:00"
-T_END = "2018-03-21 23:59:59"
+T_END   = "2018-03-21 23:59:59"
 
-SECTOR_MORNING = (7, 9)       # 07–09 LT
-SECTOR_EVENING = (18, 21)    # 18–21 LT
+SECTOR_MORNING = (22, 5)      # 22–05 LT (深夜またぎ)
+SECTOR_EVENING = (11, 17)    # 11–17 LT
+MORNING_WRAPS  = True         # モーニングセクターが深夜をまたぎぐ
 
 LAT_MIN, LAT_MAX = -60, 60
 
-DOY_BIN = 0.5
-LAT_BIN = 3.0
+DOY_BIN  = 0.5
+LAT_BIN  = 3.0
 N_LEVELS = 20
 
-RAW_COL = "density"
+RAW_COL  = "density"
 NORM_COL = "density_norm"
 
 
@@ -137,6 +138,38 @@ def daily_representative_lt_line(
     return x, y
 
 
+def daily_representative_lt_line_wrap(
+    df: pd.DataFrame,
+    lt_start: float,
+    lt_end: float,
+    stat: str = "median",
+) -> tuple[np.ndarray, np.ndarray]:
+    """
+    深夜をまたぐセクター（例: 23–05 LT）用のLT線計算。
+    lt_end 未満の値を +24 して連続プロット可能にする。
+    """
+    g = df[(df["lst_h"] >= lt_start) | (df["lst_h"] < lt_end)].copy()
+    if len(g) == 0:
+        return np.array([]), np.array([])
+
+    g["lst_h"] = g["lst_h"].where(g["lst_h"] >= lt_start, g["lst_h"] + 24)
+    g = g.set_index("datetime")
+
+    if stat == "median":
+        daily = g.resample("D")["lst_h"].median().dropna()
+    elif stat == "mean":
+        daily = g.resample("D")["lst_h"].mean().dropna()
+    else:
+        raise ValueError("stat は 'median' または 'mean' を指定してください。")
+
+    if len(daily) == 0:
+        return np.array([]), np.array([])
+
+    x = daily.index.dayofyear.to_numpy() + 0.5
+    y = daily.to_numpy()
+    return x, y
+
+
 def load_and_prepare(parquet_path: Path, density_col: str) -> pd.DataFrame:
     if not parquet_path.exists():
         raise FileNotFoundError(f"ファイルが見つかりません: {parquet_path}")
@@ -174,7 +207,11 @@ def load_and_prepare(parquet_path: Path, density_col: str) -> pd.DataFrame:
 
 
 def split_sectors(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
-    df_m = df[(df["lst_h"] >= SECTOR_MORNING[0]) & (df["lst_h"] < SECTOR_MORNING[1])].copy()
+    if MORNING_WRAPS:
+        # 深夜またぎ: OR条件でフィルタ
+        df_m = df[(df["lst_h"] >= SECTOR_MORNING[0]) | (df["lst_h"] < SECTOR_MORNING[1])].copy()
+    else:
+        df_m = df[(df["lst_h"] >= SECTOR_MORNING[0]) & (df["lst_h"] < SECTOR_MORNING[1])].copy()
     df_e = df[(df["lst_h"] >= SECTOR_EVENING[0]) & (df["lst_h"] < SECTOR_EVENING[1])].copy()
     return df_m, df_e
 
@@ -220,34 +257,34 @@ def main() -> None:
     if len(df_raw) == 0 or len(df_norm) == 0:
         raise ValueError("対象期間のデータが空です。")
 
-    doy_all = np.concatenate([df_raw["DOY"].to_numpy(), df_norm["DOY"].to_numpy()])
+    doy_all  = np.concatenate([df_raw["DOY"].to_numpy(), df_norm["DOY"].to_numpy()])
     doy_bins = np.arange(np.floor(np.nanmin(doy_all)), np.ceil(np.nanmax(doy_all)) + DOY_BIN, DOY_BIN)
     lat_bins = np.arange(LAT_MIN, LAT_MAX + LAT_BIN, LAT_BIN)
 
-    df_raw_m, df_raw_e = split_sectors(df_raw)
+    df_raw_m,  df_raw_e  = split_sectors(df_raw)
     df_norm_m, df_norm_e = split_sectors(df_norm)
 
     print(f"  RAW  morning={len(df_raw_m):,}, evening={len(df_raw_e):,}")
     print(f"  NORM morning={len(df_norm_m):,}, evening={len(df_norm_e):,}")
 
     Z = {
-        "raw_m": grid_median(df_raw_m, doy_bins, lat_bins, "density_value"),
-        "raw_e": grid_median(df_raw_e, doy_bins, lat_bins, "density_value"),
+        "raw_m":  grid_median(df_raw_m,  doy_bins, lat_bins, "density_value"),
+        "raw_e":  grid_median(df_raw_e,  doy_bins, lat_bins, "density_value"),
         "norm_m": grid_median(df_norm_m, doy_bins, lat_bins, "density_value"),
         "norm_e": grid_median(df_norm_e, doy_bins, lat_bins, "density_value"),
     }
 
-    vmin_raw, vmax_raw = row_vmin_vmax(Z["raw_m"], Z["raw_e"])
+    vmin_raw,  vmax_raw  = row_vmin_vmax(Z["raw_m"],  Z["raw_e"])
     vmin_norm, vmax_norm = row_vmin_vmax(Z["norm_m"], Z["norm_e"])
 
-    levels_raw = make_levels(vmin_raw, vmax_raw, N_LEVELS)
+    levels_raw  = make_levels(vmin_raw,  vmax_raw,  N_LEVELS)
     levels_norm = make_levels(vmin_norm, vmax_norm, N_LEVELS)
 
     X, Y = make_mesh_from_bins(doy_bins, lat_bins)
 
     fig = plt.figure(figsize=(16, 11))
     fig.suptitle(
-        "Swarm-A Thermospheric Mass Density (2018, DOY 20–80)\n"
+        "Swarm-B Thermospheric Mass Density (2018, DOY 20–80)\n"
         "Before Normalization (top) vs After Normalization (bottom)",
         fontsize=14, fontweight="bold", y=0.98
     )
@@ -261,15 +298,15 @@ def main() -> None:
     )
 
     panels = [
-        (0, 0, "raw_m",  levels_raw,  "Before norm. (07–09 LT)", SECTOR_MORNING),
-        (0, 1, "raw_e",  levels_raw,  "Before norm. (18–21 LT)", SECTOR_EVENING),
-        (1, 0, "norm_m", levels_norm, "After norm. (07–09 LT)",  SECTOR_MORNING),
-        (1, 1, "norm_e", levels_norm, "After norm. (18–21 LT)",  SECTOR_EVENING),
+        (0, 0, "raw_m",  levels_raw,  "Before norm. (22–05 LT)", SECTOR_MORNING),
+        (0, 1, "raw_e",  levels_raw,  "Before norm. (11–17 LT)", SECTOR_EVENING),
+        (1, 0, "norm_m", levels_norm, "After norm. (22–05 LT)",  SECTOR_MORNING),
+        (1, 1, "norm_e", levels_norm, "After norm. (11–17 LT)",  SECTOR_EVENING),
     ]
 
     df_lookup = {
-        "raw_m": df_raw_m,
-        "raw_e": df_raw_e,
+        "raw_m":  df_raw_m,
+        "raw_e":  df_raw_e,
         "norm_m": df_norm_m,
         "norm_e": df_norm_e,
     }
@@ -299,28 +336,44 @@ def main() -> None:
             ax.tick_params(axis="y", labelleft=False)
 
         # 参考文献に合わせた LT 線
-        lt_min, lt_max = sector
         ax_r = ax.twinx()
-        ax_r.set_ylim(lt_min, lt_max)
         ax_r.set_ylabel("LT (h)", fontsize=9)
 
-        if sector == SECTOR_MORNING:
-            ax_r.set_yticks([7, 8, 9])
+        if sector == SECTOR_MORNING and MORNING_WRAPS:
+            # 深夜またぎ: 軸を 23–29 で表示 (0→24, 1→25, ..., 5→29)
+            ax_r.set_ylim(22, 29)
+            ax_r.set_yticks([22, 23, 24, 25, 26, 27, 28, 29])
+            ax_r.set_yticklabels(["22", "23", "0", "1", "2", "3", "4", "5"])
+            x_lt, y_lt = daily_representative_lt_line_wrap(
+                df_lookup[key],
+                lt_start=SECTOR_MORNING[0],
+                lt_end=SECTOR_MORNING[1],
+                stat="median",
+            )
+        elif sector == SECTOR_MORNING:
+            ax_r.set_ylim(*SECTOR_MORNING)
+            ax_r.set_yticks(range(int(SECTOR_MORNING[0]), int(SECTOR_MORNING[1]) + 1, 2))
+            x_lt, y_lt = daily_representative_lt_line(
+                df_lookup[key],
+                lt_min=SECTOR_MORNING[0],
+                lt_max=SECTOR_MORNING[1],
+                stat="median",
+            )
         else:
-            ax_r.set_yticks([18, 19, 20, 21])
-
-        x_lt, y_lt = daily_representative_lt_line(
-            df_lookup[key],
-            lt_min=lt_min,
-            lt_max=lt_max,
-            stat="median",   # 参考図寄りなら median 推奨
-        )
+            ax_r.set_ylim(*SECTOR_EVENING)
+            ax_r.set_yticks([11, 13, 15, 17])
+            x_lt, y_lt = daily_representative_lt_line(
+                df_lookup[key],
+                lt_min=SECTOR_EVENING[0],
+                lt_max=SECTOR_EVENING[1],
+                stat="median",
+            )
         if len(x_lt) > 0:
             ax_r.plot(x_lt, y_lt, color="k", lw=1.0)
 
         ax.axvspan(36, 45, color="white", alpha=0.10, lw=0)
 
-    cb_ax_raw = fig.add_subplot(gs[0, 2])
+    cb_ax_raw  = fig.add_subplot(gs[0, 2])
     cb_ax_norm = fig.add_subplot(gs[1, 2])
 
     fig.colorbar(cf_lookup[(0, 1)], cax=cb_ax_raw).set_label(

@@ -26,13 +26,13 @@ from pathlib import Path
 # =========================
 RAW_PARQUET = Path("integrateddata/swarm_dnsapod_2018_DOY20-80.parquet")
 NORM_PARQUET = Path("normalizeddata/swarm_dnsapod_2018_normalized_DOY20-80.parquet")
-OUT_PNG = Path("Figure/swarm_dnsapod_2018_before_after_normalization_DOY20-80_LT7-9_18-21.png")
+OUT_PNG = Path("Figure/swarm_dnsapod_2018_before_after_normalization_DOY20-80_LT4-11_16-23.png")
 
 T_START = "2018-01-20 00:00:00"
 T_END = "2018-03-21 23:59:59"
 
-SECTOR_MORNING = (7, 9)       # 07–09 LT
-SECTOR_EVENING = (18, 21)    # 18–21 LT
+SECTOR_MORNING = (4, 11)      # 04–11 LT
+SECTOR_EVENING = (16, 23)    # 16–23 LT
 
 LAT_MIN, LAT_MAX = -60, 60
 
@@ -261,10 +261,10 @@ def main() -> None:
     )
 
     panels = [
-        (0, 0, "raw_m",  levels_raw,  "Before norm. (07–09 LT)", SECTOR_MORNING),
-        (0, 1, "raw_e",  levels_raw,  "Before norm. (18–21 LT)", SECTOR_EVENING),
-        (1, 0, "norm_m", levels_norm, "After norm. (07–09 LT)",  SECTOR_MORNING),
-        (1, 1, "norm_e", levels_norm, "After norm. (18–21 LT)",  SECTOR_EVENING),
+        (0, 0, "raw_m",  levels_raw,  "Before norm. (04–11 LT)", SECTOR_MORNING),
+        (0, 1, "raw_e",  levels_raw,  "Before norm. (16–23 LT)", SECTOR_EVENING),
+        (1, 0, "norm_m", levels_norm, "After norm. (04–11 LT)",  SECTOR_MORNING),
+        (1, 1, "norm_e", levels_norm, "After norm. (16–23 LT)",  SECTOR_EVENING),
     ]
 
     df_lookup = {
@@ -305,9 +305,9 @@ def main() -> None:
         ax_r.set_ylabel("LT (h)", fontsize=9)
 
         if sector == SECTOR_MORNING:
-            ax_r.set_yticks([7, 8, 9])
+            ax_r.set_yticks([4, 5, 6, 7, 8, 9, 10, 11])
         else:
-            ax_r.set_yticks([18, 19, 20, 21])
+            ax_r.set_yticks([16, 17, 18, 19, 20, 21, 22, 23])
 
         x_lt, y_lt = daily_representative_lt_line(
             df_lookup[key],
