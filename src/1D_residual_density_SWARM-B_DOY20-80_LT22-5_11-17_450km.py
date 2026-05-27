@@ -1,23 +1,21 @@
 """
-1D_residual_density_SWARM-A_extendedLT.py
+1D_residual_density_SWARM-B_DOY20-80.py
 
 Purpose:
     Compute and plot thermospheric density residuals (1D time series)
-    from Swarm-A normalized density data, with COSMIC T(10 hPa) overlay.
-    This version uses LT sectors (Morning: 04-11 LT, Evening: 16-23 LT)
-    selected based on the actual satellite LT track visible in the 2D density plot.
+    from Swarm-B normalized density data, with COSMIC T(10 hPa) overlay.
 
 Steps:
-    1. Load Swarm-A normalized density (DOY 20-80)
-    2. Filter by lat (-60 to 60) and extended LT sector (Morning / Evening)
+    1. Load Swarm-B normalized density (DOY 20-80)
+    2. Filter by lat (-60 to 60) and LT sector (Night 01-04 LT / Day 13-15 LT)
     3. Compute daily mean density per sector
     4. Define reference as mean over non-SSW periods (DOY 20-40 & 61-80)
     5. Residual = daily_density - reference
     6. Load COSMIC T(10 hPa) daily mean from pre-computed CSV
-    7. Plot 2-panel figure (Morning / Evening) with SSW shading + COSMIC overlay
+    7. Plot 2-panel figure (Night / Day) with SSW shading + COSMIC overlay
 
 Output:
-    Figure/1D_residual_SWARM-A_DOY20-80_LT4-11_16-23.png
+    Figure/1D_residual_SWARM-B_DOY20-80.png
 """
 
 from __future__ import annotations
@@ -27,20 +25,19 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import matplotlib.ticker as ticker
 
 # ============================================================
 # Settings
 # ============================================================
-NORM_PARQUET  = Path("normalizeddata/swarm_dnsapod_2018_normalized_DOY20-80.parquet")
+NORM_PARQUET  = Path("normalizeddata/swarm_dnsbpod_2018_normalized_DOY20-80(450km).parquet")
 COSMIC_CSV    = Path("cosmic_T10hPa_daily_2018_DOY020_080_lat60_90N.csv")
-OUT_PNG       = Path("Figure/1D_residual_SWARM-A_DOY20-80_LT4-11_16-23.png")
+OUT_PNG       = Path("Figure/1D_residual_SWARM-B_DOY20-80_LT22-5_11-17_450km.png")
 
 DOY_START, DOY_END = 20, 80          # analysis range
 LAT_MIN, LAT_MAX   = -60.0, 60.0    # latitude filter
 
-SECTOR_MORNING = (4, 11)             # Morning (04–11 LT)
-SECTOR_EVENING = (16, 23)           # Evening (16–23 LT)
+SECTOR_NIGHT = (22, 5)     # Night (22–05 LT)
+SECTOR_DAY   = (11, 17)    # Day (11–17 LT)
 
 # SSW period
 DOY_SSW_START, DOY_SSW_END = 41, 60
@@ -58,7 +55,7 @@ COSMIC_LAT_LABEL = "60–90°N"
 # ============================================================
 def load_swarm_daily(parquet: Path) -> dict[str, pd.Series]:
     """Returns dict of {sector_label: daily_mean_Series indexed by DOY (integer)}"""
-    print("Loading Swarm-A normalized density ...")
+    print("Loading Swarm-B normalized density ...")
     df = pd.read_parquet(parquet)
     df["datetime"] = pd.to_datetime(df["datetime"], utc=True)
     df = df.dropna(subset=["datetime", "lat", "lst_h", "density_norm"])
@@ -69,9 +66,6 @@ def load_swarm_daily(parquet: Path) -> dict[str, pd.Series]:
                  + dt.dt.hour / 24.0
                  + dt.dt.minute / 1440.0)
 
-    # Date key for daily grouping
-    df["date"] = df["datetime"].dt.date
-
     # Latitude filter
     df = df[(df["lat"] >= LAT_MIN) & (df["lat"] <= LAT_MAX)]
 
@@ -81,10 +75,13 @@ def load_swarm_daily(parquet: Path) -> dict[str, pd.Series]:
 
     result = {}
     for label, (lt_min, lt_max) in [
-        ("morning", SECTOR_MORNING),
-        ("evening", SECTOR_EVENING),
+        ("night", SECTOR_NIGHT),
+        ("day",   SECTOR_DAY),
     ]:
-        sec = df[(df["lst_h"] >= lt_min) & (df["lst_h"] < lt_max)]
+        if label == "night":
+            sec = df[(df["lst_h"] >= lt_min) | (df["lst_h"] < lt_max)]
+        else:
+            sec = df[(df["lst_h"] >= lt_min) & (df["lst_h"] < lt_max)]
         daily = sec.groupby("DOY_int")["density_norm"].mean().rename(label)
         result[label] = daily
         print(f"  {label}: {len(daily)} days with data")
@@ -135,19 +132,19 @@ def load_cosmic_T10(csv_path: Path) -> pd.Series:
 # Step 7: Publication-quality 2-panel plot
 # ============================================================
 def plot_residuals(
-    res_morning: pd.Series,
-    res_evening:  pd.Series,
-    ref_morning:  float,
-    ref_evening:  float,
-    cosmic_T10:   pd.Series,
+    res_night: pd.Series,
+    res_day:   pd.Series,
+    ref_night: float,
+    ref_day:   float,
+    cosmic_T10: pd.Series,
 ) -> None:
 
     fig, axes = plt.subplots(2, 1, figsize=(11, 8), sharex=True)
     fig.subplots_adjust(hspace=0.08)
 
     sectors = [
-        (axes[0], res_morning, ref_morning, "Morning (04–11 LT)", "#2A6AE0"),
-        (axes[1], res_evening, ref_evening, "Evening (16–23 LT)", "#E05C2A"),
+        (axes[0], res_night, ref_night, "Night (22–05 LT)",  "#2A6AE0"),
+        (axes[1], res_day,   ref_day,   "Day (11–17 LT)",    "#E05C2A"),
     ]
 
     # Shared x limits
@@ -218,8 +215,8 @@ def plot_residuals(
     axes[1].set_xlabel("Day of Year (2018)", fontsize=12)
 
     fig.suptitle(
-        "Swarm-A Residual Normalized Density (DOY 20–80, 2018)\n"
-        "Reference: mean over non-SSW periods (DOY 20–40 & 61–80)  [LT: 04–11 / 16–23]",
+        "Swarm-B Residual Normalized Density (DOY 20–80, 2018)\n"
+        "Reference: mean over non-SSW periods (DOY 20–40 & 61–80, ref: 450 km)  [LT: 22–05 / 11–17]",
         fontsize=13, fontweight="bold", y=0.995,
     )
 
@@ -235,16 +232,16 @@ def plot_residuals(
 def main() -> None:
     # Swarm daily means
     daily = load_swarm_daily(NORM_PARQUET)
-    ref_m, res_m = compute_residual(daily["morning"])
-    ref_e, res_e = compute_residual(daily["evening"])
-    print(f"  Morning reference: {ref_m:.4e} kg/m³")
-    print(f"  Evening reference: {ref_e:.4e} kg/m³")
+    ref_n, res_n = compute_residual(daily["night"])
+    ref_d, res_d = compute_residual(daily["day"])
+    print(f"  Night reference: {ref_n:.4e} kg/m³")
+    print(f"  Day reference:   {ref_d:.4e} kg/m³")
 
     # COSMIC T(10 hPa)
     cosmic_T10 = load_cosmic_T10(COSMIC_CSV)
 
     # Plot
-    plot_residuals(res_m, res_e, ref_m, ref_e, cosmic_T10)
+    plot_residuals(res_n, res_d, ref_n, ref_d, cosmic_T10)
 
 
 if __name__ == "__main__":

@@ -1,15 +1,13 @@
 """
-1D_residual_density_SWARM-A_extendedLT.py
+1D_residual_density_SWARM-C_DOY20-80.py
 
 Purpose:
     Compute and plot thermospheric density residuals (1D time series)
-    from Swarm-A normalized density data, with COSMIC T(10 hPa) overlay.
-    This version uses LT sectors (Morning: 04-11 LT, Evening: 16-23 LT)
-    selected based on the actual satellite LT track visible in the 2D density plot.
+    from Swarm-C normalized density data, with COSMIC T(10 hPa) overlay.
 
 Steps:
-    1. Load Swarm-A normalized density (DOY 20-80)
-    2. Filter by lat (-60 to 60) and extended LT sector (Morning / Evening)
+    1. Load Swarm-C normalized density (DOY 20-80)
+    2. Filter by lat (-60 to 60) and LT sector (Morning 07-09 LT / Evening 18-21 LT)
     3. Compute daily mean density per sector
     4. Define reference as mean over non-SSW periods (DOY 20-40 & 61-80)
     5. Residual = daily_density - reference
@@ -17,7 +15,7 @@ Steps:
     7. Plot 2-panel figure (Morning / Evening) with SSW shading + COSMIC overlay
 
 Output:
-    Figure/1D_residual_SWARM-A_DOY20-80_LT4-11_16-23.png
+    Figure/1D_residual_SWARM-C_DOY20-80.png
 """
 
 from __future__ import annotations
@@ -27,20 +25,19 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import matplotlib.ticker as ticker
 
 # ============================================================
 # Settings
 # ============================================================
-NORM_PARQUET  = Path("normalizeddata/swarm_dnsapod_2018_normalized_DOY20-80.parquet")
+NORM_PARQUET  = Path("normalizeddata/swarm_dnscpod_2018_normalized_DOY20-80.parquet")
 COSMIC_CSV    = Path("cosmic_T10hPa_daily_2018_DOY020_080_lat60_90N.csv")
-OUT_PNG       = Path("Figure/1D_residual_SWARM-A_DOY20-80_LT4-11_16-23.png")
+OUT_PNG       = Path("Figure/1D_residual_SWARM-C_DOY20-80_LT4-11_16-23.png")
 
 DOY_START, DOY_END = 20, 80          # analysis range
 LAT_MIN, LAT_MAX   = -60.0, 60.0    # latitude filter
 
-SECTOR_MORNING = (4, 11)             # Morning (04–11 LT)
-SECTOR_EVENING = (16, 23)           # Evening (16–23 LT)
+SECTOR_MORNING = (4, 11)
+SECTOR_EVENING = (16, 23)
 
 # SSW period
 DOY_SSW_START, DOY_SSW_END = 41, 60
@@ -58,7 +55,7 @@ COSMIC_LAT_LABEL = "60–90°N"
 # ============================================================
 def load_swarm_daily(parquet: Path) -> dict[str, pd.Series]:
     """Returns dict of {sector_label: daily_mean_Series indexed by DOY (integer)}"""
-    print("Loading Swarm-A normalized density ...")
+    print("Loading Swarm-C normalized density ...")
     df = pd.read_parquet(parquet)
     df["datetime"] = pd.to_datetime(df["datetime"], utc=True)
     df = df.dropna(subset=["datetime", "lat", "lst_h", "density_norm"])
@@ -68,9 +65,6 @@ def load_swarm_daily(parquet: Path) -> dict[str, pd.Series]:
     df["DOY"] = (dt.dt.dayofyear
                  + dt.dt.hour / 24.0
                  + dt.dt.minute / 1440.0)
-
-    # Date key for daily grouping
-    df["date"] = df["datetime"].dt.date
 
     # Latitude filter
     df = df[(df["lat"] >= LAT_MIN) & (df["lat"] <= LAT_MAX)]
@@ -218,7 +212,7 @@ def plot_residuals(
     axes[1].set_xlabel("Day of Year (2018)", fontsize=12)
 
     fig.suptitle(
-        "Swarm-A Residual Normalized Density (DOY 20–80, 2018)\n"
+        "Swarm-C Residual Normalized Density (DOY 20–80, 2018)\n"
         "Reference: mean over non-SSW periods (DOY 20–40 & 61–80)  [LT: 04–11 / 16–23]",
         fontsize=13, fontweight="bold", y=0.995,
     )

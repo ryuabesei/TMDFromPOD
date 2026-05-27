@@ -25,15 +25,15 @@ from pathlib import Path
 # 設定
 # =========================
 RAW_PARQUET  = Path("integrateddata/swarm_dnsbpod_2018_DOY20-80.parquet")
-NORM_PARQUET = Path("normalizeddata/swarm_dnsbpod_2018_normalized_DOY20-80.parquet")
-OUT_PNG      = Path("Figure/swarm_dnsbpod_2018_before_after_normalization_DOY20-80_LT22-5_11-17.png")
+NORM_PARQUET = Path("normalizeddata/swarm_dnsbpod_2018_normalized_DOY20-80(450km).parquet")
+OUT_PNG      = Path("Figure/swarm_dnsbpod_2018_before_after_normalization_DOY20-80_LT1-3_13-15_450km.png")
 
 T_START = "2018-01-20 00:00:00"
 T_END   = "2018-03-21 23:59:59"
 
-SECTOR_MORNING = (22, 5)      # 22–05 LT (深夜またぎ)
-SECTOR_EVENING = (11, 17)    # 11–17 LT
-MORNING_WRAPS  = True         # モーニングセクターが深夜をまたぎぐ
+SECTOR_MORNING = (1, 3)       # 01–03 LT
+SECTOR_EVENING = (13, 15)    # 13–15 LT
+MORNING_WRAPS  = False        # 深夜をまたがないぐ
 
 LAT_MIN, LAT_MAX = -60, 60
 
@@ -285,7 +285,7 @@ def main() -> None:
     fig = plt.figure(figsize=(16, 11))
     fig.suptitle(
         "Swarm-B Thermospheric Mass Density (2018, DOY 20–80)\n"
-        "Before Normalization (top) vs After Normalization (bottom, ref: 520 km, F10.7=70, Ap=4)",
+        "Before Normalization (top) vs After Normalization (bottom)",
         fontsize=14, fontweight="bold", y=0.98
     )
 
@@ -298,10 +298,10 @@ def main() -> None:
     )
 
     panels = [
-        (0, 0, "raw_m",  levels_raw,  "Before norm. (22–05 LT)", SECTOR_MORNING),
-        (0, 1, "raw_e",  levels_raw,  "Before norm. (11–17 LT)", SECTOR_EVENING),
-        (1, 0, "norm_m", levels_norm, "After norm. (22–05 LT)",  SECTOR_MORNING),
-        (1, 1, "norm_e", levels_norm, "After norm. (11–17 LT)",  SECTOR_EVENING),
+        (0, 0, "raw_m",  levels_raw,  "Before norm. (01–03 LT)", SECTOR_MORNING),
+        (0, 1, "raw_e",  levels_raw,  "Before norm. (13–15 LT)", SECTOR_EVENING),
+        (1, 0, "norm_m", levels_norm, "After norm. (01–03 LT)",  SECTOR_MORNING),
+        (1, 1, "norm_e", levels_norm, "After norm. (13–15 LT)",  SECTOR_EVENING),
     ]
 
     df_lookup = {
@@ -341,9 +341,9 @@ def main() -> None:
 
         if sector == SECTOR_MORNING and MORNING_WRAPS:
             # 深夜またぎ: 軸を 23–29 で表示 (0→24, 1→25, ..., 5→29)
-            ax_r.set_ylim(22, 29)
-            ax_r.set_yticks([22, 23, 24, 25, 26, 27, 28, 29])
-            ax_r.set_yticklabels(["22", "23", "0", "1", "2", "3", "4", "5"])
+            ax_r.set_ylim(23, 29)
+            ax_r.set_yticks([23, 24, 25, 26, 27, 28, 29])
+            ax_r.set_yticklabels(["23", "0", "1", "2", "3", "4", "5"])
             x_lt, y_lt = daily_representative_lt_line_wrap(
                 df_lookup[key],
                 lt_start=SECTOR_MORNING[0],
@@ -361,7 +361,7 @@ def main() -> None:
             )
         else:
             ax_r.set_ylim(*SECTOR_EVENING)
-            ax_r.set_yticks([11, 13, 15, 17])
+            ax_r.set_yticks([13, 14, 15])
             x_lt, y_lt = daily_representative_lt_line(
                 df_lookup[key],
                 lt_min=SECTOR_EVENING[0],
@@ -380,7 +380,7 @@ def main() -> None:
         "Density [kg m$^{-3}$]", fontsize=10
     )
     fig.colorbar(cf_lookup[(1, 1)], cax=cb_ax_norm).set_label(
-        "Normalized density [kg m$^{-3}$]\n(ref: 520 km, F10.7=70, Ap=4)",
+        "Normalized density [kg m$^{-3}$]\n(ref: 450 km, F10.7=70, Ap=4)",
         fontsize=10
     )
 

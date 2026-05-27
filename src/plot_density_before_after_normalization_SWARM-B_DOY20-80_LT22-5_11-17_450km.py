@@ -25,8 +25,8 @@ from pathlib import Path
 # 設定
 # =========================
 RAW_PARQUET  = Path("integrateddata/swarm_dnsbpod_2018_DOY20-80.parquet")
-NORM_PARQUET = Path("normalizeddata/swarm_dnsbpod_2018_normalized_DOY20-80.parquet")
-OUT_PNG      = Path("Figure/swarm_dnsbpod_2018_before_after_normalization_DOY20-80_LT22-5_11-17.png")
+NORM_PARQUET = Path("normalizeddata/swarm_dnsbpod_2018_normalized_DOY20-80(450km).parquet")
+OUT_PNG      = Path("Figure/swarm_dnsbpod_2018_before_after_normalization_DOY20-80_LT22-5_11-17_450km.png")
 
 T_START = "2018-01-20 00:00:00"
 T_END   = "2018-03-21 23:59:59"
@@ -285,7 +285,7 @@ def main() -> None:
     fig = plt.figure(figsize=(16, 11))
     fig.suptitle(
         "Swarm-B Thermospheric Mass Density (2018, DOY 20–80)\n"
-        "Before Normalization (top) vs After Normalization (bottom, ref: 520 km, F10.7=70, Ap=4)",
+        "Before Normalization (top) vs After Normalization (bottom, ref: 450 km, F10.7=70, Ap=4)",
         fontsize=14, fontweight="bold", y=0.98
     )
 
@@ -380,7 +380,7 @@ def main() -> None:
         "Density [kg m$^{-3}$]", fontsize=10
     )
     fig.colorbar(cf_lookup[(1, 1)], cax=cb_ax_norm).set_label(
-        "Normalized density [kg m$^{-3}$]\n(ref: 520 km, F10.7=70, Ap=4)",
+        "Normalized density [kg m$^{-3}$]\n(ref: 450 km, F10.7=70, Ap=4)",
         fontsize=10
     )
 
