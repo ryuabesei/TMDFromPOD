@@ -5,7 +5,7 @@ Swarm-C (normalized density) で Liu et al. Figure 1 相当（等高線版）を
 - figures/swarmc_fig1_like_contour.png
 
 入力:
-- normalizeddata/swarm_dnscpod_2018_normalized.parquet
+- normalizeddata/2018/swarm_dnscpod_2018_normalized.parquet
 - data/Kpindex/SW-All.csv
 """
 
@@ -18,9 +18,9 @@ import matplotlib.pyplot as plt
 # =========================
 # 入出力
 # =========================
-IN_PARQUET = Path("normalizeddata/swarm_dnscpod_2018_normalized.parquet")
+IN_PARQUET = Path("normalizeddata/2018/swarm_dnscpod_2018_normalized.parquet")
 KP_CSV     = Path("data/Kpindex/SW-All.csv")
-OUT_PNG    = Path("Figure/swarmc_fig1_like_contour.png")
+OUT_PNG    = Path("Figure/2018/swarmc_fig1_like_contour.png")
 
 
 # =========================

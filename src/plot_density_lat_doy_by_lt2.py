@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 # =========================
 # 設定
 # =========================
-PARQUET = "normalizeddata/swarm_dnscpod_2018_normalized.parquet"
+PARQUET = "normalizeddata/2018/swarm_dnscpod_2018_normalized.parquet"
 
 # プロット期間（15日）
 T_START = "2018-02-05 00:00:00"

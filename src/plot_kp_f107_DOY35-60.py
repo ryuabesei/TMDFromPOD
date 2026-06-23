@@ -7,7 +7,7 @@ plot_kp_f107_DOY35-60.py
     右軸: 日平均Kp（棒グラフ）+ 3時間Kp（散布点）
 
 出力:
-    Figure/Kp_F107_DOY35-60.png
+    Figure/2018/Kp_F107_DOY35-60.png
 """
 
 import matplotlib
@@ -23,7 +23,7 @@ import matplotlib.patches as mpatches
 # 設定
 # =========================
 KPINDEX_CSV = Path("data/Kpindex/SW-20180120_20180320.csv")
-OUT_PNG     = Path("Figure/Kp_F107_DOY35-60.png")
+OUT_PNG     = Path("Figure/2018/Kp_F107_DOY35-60.png")
 
 DOY_START     = 35
 DOY_END       = 60

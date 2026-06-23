@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 # =========================
 # 入力
 # =========================
-SWARM_PARQUET = Path("normalizeddata/swarm_dnscpod_2018_normalized.parquet")
+SWARM_PARQUET = Path("normalizeddata/2018/swarm_dnscpod_2018_normalized.parquet")
 COSMIC_CSV = Path("cosmic_T10hPa_daily_2018_DOY032_050_lat60_90N.csv")
 
 START_DATE = "2018-02-05"

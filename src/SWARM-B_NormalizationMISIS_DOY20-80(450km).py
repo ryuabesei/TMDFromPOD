@@ -14,11 +14,11 @@ NormalizationMISIS.py（pymsis 0.12.0 対応・決定版）
   ref_cond : 観測時刻・観測位置・基準高度 + F10.7=70 / Kp=1相当(Ap≈4)
 
 入力:
-- integrateddata/swarm_dnsbpod_2018_DOY20-80.parquet
+- integrateddata/2018/swarm_dnsbpod_2018_DOY20-80.parquet
 - data/Kpindex/SW-20180120_20180320.csv
 
 出力:
-- normalizeddata/swarm_dnsbpod_2018_normalized_DOY20-80(450km).parquet
+- normalizeddata/2018/swarm_dnsbpod_2018_normalized_DOY20-80(450km).parquet
 """
 
 from __future__ import annotations
@@ -31,9 +31,9 @@ import pandas as pd
 # =========================
 # 入出力パス（ユーザー指定）
 # =========================
-SWARM_PARQUET = Path("integrateddata/swarm_dnsbpod_2018_DOY20-80.parquet")
+SWARM_PARQUET = Path("integrateddata/2018/swarm_dnsbpod_2018_DOY20-80.parquet")
 KPINDEX_CSV   = Path("data/Kpindex/SW-20180120_20180320.csv")
-OUT_PARQUET   = Path("normalizeddata/swarm_dnsbpod_2018_normalized_DOY20-80(450km).parquet")
+OUT_PARQUET   = Path("normalizeddata/2018/swarm_dnsbpod_2018_normalized_DOY20-80(450km).parquet")
 
 
 # =========================

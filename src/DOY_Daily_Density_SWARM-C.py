@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 # =========================
 # 入力
 # =========================
-PARQUET_PATH = Path("normalizeddata/swarm_dnscpod_2018_normalized.parquet")
+PARQUET_PATH = Path("normalizeddata/2018/swarm_dnscpod_2018_normalized.parquet")
 
 # 表示したい期間（UTC基準）
 START_DATE = "2018-02-05"

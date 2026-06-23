@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 # =========================
 # データ読み込み
 # =========================
-df = pd.read_parquet("normalizeddata/swarm_dnscpod_2018_normalized.parquet")
+df = pd.read_parquet("normalizeddata/2018/swarm_dnscpod_2018_normalized.parquet")
 df["datetime"] = pd.to_datetime(df["datetime"], utc=True)
 
 # 期間（先行研究と同じDOY範囲に近い例）

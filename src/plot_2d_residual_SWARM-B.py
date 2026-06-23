@@ -7,7 +7,7 @@ plot_2d_residual_SWARM-B.py
     3. SWARM-B のLTセクター（01–04 LT / 13–15 LT）で contourf 表示
 
 出力:
-    Figure/2D_residual_SWARM-B.png
+    Figure/2018/2D_residual_SWARM-B.png
 """
 
 from __future__ import annotations
@@ -23,8 +23,8 @@ from pathlib import Path
 # =========================
 # 設定
 # =========================
-NORM_PARQUET = Path("normalizeddata/swarm_dnsbpod_2018_normalized.parquet")
-OUT_PNG      = Path("Figure/2D_residual_SWARM-B.png")
+NORM_PARQUET = Path("normalizeddata/2018/swarm_dnsbpod_2018_normalized.parquet")
+OUT_PNG      = Path("Figure/2018/2D_residual_SWARM-B.png")
 
 T_START = "2018-02-05 00:00:00"
 T_END   = "2018-02-21 23:59:59"

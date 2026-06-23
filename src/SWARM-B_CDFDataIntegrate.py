@@ -112,5 +112,5 @@ print(all_df.index.min(), "->", all_df.index.max(), "N=", len(all_df))
 
 # ---- 保存（おすすめ：parquet） ----
 # parquet は高速・軽量で、後の解析に便利
-all_df.to_parquet("integrateddata/swarm_dnsbpod_2018.parquet")
-print("Saved: integrateddata/swarm_dnsbpod_2018.parquet")
+all_df.to_parquet("integrateddata/2018/swarm_dnsbpod_2018.parquet")
+print("Saved: integrateddata/2018/swarm_dnsbpod_2018.parquet")

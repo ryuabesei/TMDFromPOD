@@ -7,7 +7,7 @@ plot_LT_DailyDensity_before_after_SWARM-A.py
     1日平均の折れ線グラフで重ね描きし、正規化の効果を確認する。
 
 出力:
-    Figure/LT_DailyDensity_before_after_SWARM-A_DOY20-80.png
+    Figure/2018/LT_DailyDensity_before_after_SWARM-A_DOY20-80.png
 """
 
 from __future__ import annotations
@@ -22,9 +22,9 @@ from pymsis import msis
 # =========================
 # 設定
 # =========================
-RAW_PARQUET  = Path("integrateddata/swarm_dnsapod_2018.parquet")
-NORM_PARQUET = Path("normalizeddata/swarm_dnsapod_2018_normalized_DOY20-80.parquet")
-OUT_PNG      = Path("Figure/LT_DailyDensity_before_after_SWARM-A_DOY20-80.png")
+RAW_PARQUET  = Path("integrateddata/2018/swarm_dnsapod_2018.parquet")
+NORM_PARQUET = Path("normalizeddata/2018/swarm_dnsapod_2018_normalized_DOY20-80.parquet")
+OUT_PNG      = Path("Figure/2018/LT_DailyDensity_before_after_SWARM-A_DOY20-80.png")
 
 DOY_START, DOY_END = 20, 80
 
@@ -66,7 +66,7 @@ def main():
     
     # Check if we should fallback to the full year normalized file if the DOY20-80 one doesn't exist
     if not NORM_PARQUET.exists():
-        norm_path = Path("normalizeddata/swarm_dnsapod_2018_normalized.parquet")
+        norm_path = Path("normalizeddata/2018/swarm_dnsapod_2018_normalized.parquet")
         print(f"Fallback to {norm_path}")
     else:
         norm_path = NORM_PARQUET

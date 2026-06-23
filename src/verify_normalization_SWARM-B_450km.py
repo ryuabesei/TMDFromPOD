@@ -19,11 +19,11 @@ verify_normalization_SWARM-B_450km.py
        - rho_obs vs rho_model_real が一直線になるか（モデル精度確認）
 
 入力:
-    integrateddata/swarm_dnsbpod_2018_DOY20-80.parquet
-    normalizeddata/swarm_dnsbpod_2018_normalized_DOY20-80(450km).parquet
+    integrateddata/2018/swarm_dnsbpod_2018_DOY20-80.parquet
+    normalizeddata/2018/swarm_dnsbpod_2018_normalized_DOY20-80(450km).parquet
 
 出力:
-    Figure/verify_normalization_SWARM-B_450km.png
+    Figure/2018/verify_normalization_SWARM-B_450km.png
 """
 
 from __future__ import annotations
@@ -40,10 +40,10 @@ from scipy import stats
 # ============================================================
 # 設定
 # ============================================================
-RAW_PARQUET  = Path("integrateddata/swarm_dnsbpod_2018_DOY20-80.parquet")
-NORM_PARQUET = Path("normalizeddata/swarm_dnsbpod_2018_normalized_DOY20-80(450km).parquet")
+RAW_PARQUET  = Path("integrateddata/2018/swarm_dnsbpod_2018_DOY20-80.parquet")
+NORM_PARQUET = Path("normalizeddata/2018/swarm_dnsbpod_2018_normalized_DOY20-80(450km).parquet")
 KPINDEX_CSV  = Path("data/Kpindex/SW-20180120_20180320.csv")
-OUT_PNG      = Path("Figure/verify_normalization_SWARM-B_450km.png")
+OUT_PNG      = Path("Figure/2018/verify_normalization_SWARM-B_450km.png")
 
 LAT_MIN, LAT_MAX = -60.0, 60.0
 DOY_START, DOY_END = 20, 80

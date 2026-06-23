@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-PARQUET = "normalizeddata/swarm_dnsbpod_2018_normalized.parquet"
+PARQUET = "normalizeddata/2018/swarm_dnsbpod_2018_normalized.parquet"
 T_START = "2018-02-05 00:00:00"
 T_END   = "2018-02-20 23:59:59"
 

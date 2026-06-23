@@ -62,7 +62,7 @@ all_df = all_df[(all_df.index >= DATE_START) & (all_df.index <= DATE_END)]
 print(f"  After DOY20-80 filter: {len(all_df):,}  ({all_df.index.min()} -> {all_df.index.max()})")
 
 # 保存
-out_path = Path("integrateddata/swarm_dnsapod_2018_DOY20-80.parquet")
+out_path = Path("integrateddata/2018/swarm_dnsapod_2018_DOY20-80.parquet")
 out_path.parent.mkdir(parents=True, exist_ok=True)
 all_df.to_parquet(out_path)
 print(f"Saved: {out_path}")

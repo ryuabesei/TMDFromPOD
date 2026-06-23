@@ -126,7 +126,7 @@ def plot_density_vs_doy(df: pd.DataFrame):
 # =========================
 # 実行部分
 # =========================
-df = pd.read_parquet("integrateddata/swarm_dnsapod_2018.parquet")
+df = pd.read_parquet("integrateddata/2018/swarm_dnsapod_2018.parquet")
 
 # density_norm準備
 df = prepare_density(df)

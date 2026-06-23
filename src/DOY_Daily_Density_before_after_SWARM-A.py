@@ -6,12 +6,12 @@ DOY_Daily_Density_before_after_SWARM-A.py
     1日平均の折れ線グラフで重ね描きし、正規化の効果を確認する。
 
 線の構成:
-    ① Raw observed density      : integrateddata/swarm_dnsapod_2018.parquet
-    ② Normalized density        : normalizeddata/swarm_dnsapod_2018_normalized.parquet
+    ① Raw observed density      : integrateddata/2018/swarm_dnsapod_2018.parquet
+    ② Normalized density        : normalizeddata/2018/swarm_dnsapod_2018_normalized.parquet
     ③ MSIS reference density    : 基準条件（alt=450km, F10.7=70, Ap=4）で計算
 
 出力:
-    Figure/DailyDensity_before_after_SWARM-A.png
+    Figure/2018/DailyDensity_before_after_SWARM-A.png
 """
 
 from __future__ import annotations
@@ -27,9 +27,9 @@ from pymsis import msis
 # =========================
 # 設定
 # =========================
-RAW_PARQUET  = Path("integrateddata/swarm_dnsapod_2018.parquet")
-NORM_PARQUET = Path("normalizeddata/swarm_dnsapod_2018_normalized.parquet")
-OUT_PNG      = Path("Figure/DailyDensity_before_after_SWARM-A.png")
+RAW_PARQUET  = Path("integrateddata/2018/swarm_dnsapod_2018.parquet")
+NORM_PARQUET = Path("normalizeddata/2018/swarm_dnsapod_2018_normalized.parquet")
+OUT_PNG      = Path("Figure/2018/DailyDensity_before_after_SWARM-A.png")
 
 START_DATE = "2018-02-05"
 END_DATE   = "2018-02-20"

@@ -16,7 +16,7 @@ Steps:
     7. Plot 2-panel figure (Night / Day) with SSW shading + COSMIC overlay
 
 Output:
-    Figure/1D_residual_SWARM-B_DOY35-60_LT22-5_11-17_450km.png
+    Figure/2018/1D_residual_SWARM-B_DOY35-60_LT22-5_11-17_450km.png
 """
 
 from __future__ import annotations
@@ -30,9 +30,9 @@ import matplotlib.pyplot as plt
 # ============================================================
 # Settings
 # ============================================================
-NORM_PARQUET  = Path("normalizeddata/swarm_dnsbpod_2018_normalized_DOY20-80(450km).parquet")
+NORM_PARQUET  = Path("normalizeddata/2018/swarm_dnsbpod_2018_normalized_DOY20-80(450km).parquet")
 COSMIC_CSV    = Path("cosmic_T10hPa_daily_2018_DOY020_080_lat60_90N.csv")
-OUT_PNG       = Path("Figure/1D_residual_SWARM-B_DOY35-60_LT22-5_11-17_450km.png")
+OUT_PNG       = Path("Figure/2018/1D_residual_SWARM-B_DOY35-60_LT22-5_11-17_450km.png")
 
 DOY_START, DOY_END = 35, 60          # analysis range (narrowed from 20-80)
 LAT_MIN, LAT_MAX   = -60.0, 60.0    # latitude filter

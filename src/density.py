@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 # =========================
 # 入力データ
 # =========================
-PARQUET = "normalizeddata/swarm_dnscpod_2018_normalized.parquet"
+PARQUET = "normalizeddata/2018/swarm_dnscpod_2018_normalized.parquet"
 
 # -------------------------
 # データ読み込み

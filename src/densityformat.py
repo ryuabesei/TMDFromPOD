@@ -10,10 +10,10 @@ import matplotlib.pyplot as plt
 # -------------------------
 # 1. parquet ファイルの読み込み
 # -------------------------
-# integrateddata/swarm_dnscpod_2018.parquet は、
+# integrateddata/2018/swarm_dnscpod_2018.parquet は、
 # すでに CDF から読み込んで前処理した Swarm の密度データ
 # index は UTC の DatetimeIndex になっている想定
-df = pd.read_parquet("integrateddata/swarm_dnsbpod_2018.parquet")
+df = pd.read_parquet("integrateddata/2018/swarm_dnsbpod_2018.parquet")
 
 
 # -------------------------

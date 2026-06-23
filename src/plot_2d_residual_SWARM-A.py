@@ -7,7 +7,7 @@ plot_2d_residual_SWARM-A.py
     3. 参考図と同様のレイアウト（モーニング/イブニング × 2列）で residual を contourf 表示
 
 出力:
-    Figure/2D_residual_SWARM-A.png
+    Figure/2018/2D_residual_SWARM-A.png
 """
 
 from __future__ import annotations
@@ -23,8 +23,8 @@ from pathlib import Path
 # =========================
 # 設定
 # =========================
-NORM_PARQUET = Path("normalizeddata/swarm_dnsapod_2018_normalized.parquet")
-OUT_PNG      = Path("Figure/2D_residual_SWARM-A.png")
+NORM_PARQUET = Path("normalizeddata/2018/swarm_dnsapod_2018_normalized.parquet")
+OUT_PNG      = Path("Figure/2018/2D_residual_SWARM-A.png")
 
 T_START = "2018-02-05 00:00:00"   # DOY 36
 T_END   = "2018-02-21 23:59:59"   # DOY 52

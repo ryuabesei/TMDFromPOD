@@ -11,7 +11,7 @@ Purpose:
 from pathlib import Path
 import pandas as pd
 
-PARQUET = Path("normalizeddata/swarm_dnsapod_2018_normalized_DOY20-80.parquet")
+PARQUET = Path("normalizeddata/2018/swarm_dnsapod_2018_normalized_DOY20-80.parquet")
 DOY_START, DOY_END = 20, 80
 LAT_MIN, LAT_MAX = -60.0, 60.0
 
@@ -71,7 +71,7 @@ def main():
     print("="*70)
 
     # Save to a CSV for easy reference
-    out_csv = Path("Figure/swarm-a_daily_lt_doy20-80.csv")
+    out_csv = Path("Figure/2018/swarm-a_daily_lt_doy20-80.csv")
     out_csv.parent.mkdir(parents=True, exist_ok=True)
     df_lt.to_csv(out_csv, index=False)
     print(f"\n✅ Saved daily LT values to: {out_csv}")

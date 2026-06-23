@@ -13,9 +13,9 @@ from pathlib import Path
 # -------------------------
 
 FILES = {
-    "SWARM-A": "normalizeddata/swarm_dnsapod_2018_normalized.parquet",
-    "SWARM-B": "normalizeddata/swarm_dnsbpod_2018_normalized.parquet",
-    "SWARM-C": "normalizeddata/swarm_dnscpod_2018_normalized.parquet",
+    "SWARM-A": "normalizeddata/2018/swarm_dnsapod_2018_normalized.parquet",
+    "SWARM-B": "normalizeddata/2018/swarm_dnsbpod_2018_normalized.parquet",
+    "SWARM-C": "normalizeddata/2018/swarm_dnscpod_2018_normalized.parquet",
 }
 
 REP_DATES = ["2018-02-08", "2018-02-11", "2018-02-13", "2018-02-15" ,"2018-02-17", "2018-02-19"]

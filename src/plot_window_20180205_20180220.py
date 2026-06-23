@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-PARQUET = "normalizeddata/swarm_dnscpod_2018_normalized.parquet"
+PARQUET = "normalizeddata/2018/swarm_dnscpod_2018_normalized.parquet"
 t0 = pd.Timestamp("2018-02-05 00:00:00", tz="UTC")
 t1 = pd.Timestamp("2018-02-21 00:00:00", tz="UTC")
 

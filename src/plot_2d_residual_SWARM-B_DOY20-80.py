@@ -8,7 +8,7 @@ plot_2d_residual_SWARM-B_DOY20-80.py
     4. SSW期間（DOY 41-60）をハイライト
 
 出力:
-    Figure/2D_residual_SWARM-B_DOY20-80.png
+    Figure/2018/2D_residual_SWARM-B_DOY20-80.png
 """
 
 from __future__ import annotations
@@ -24,8 +24,8 @@ from pathlib import Path
 # =========================
 # 設定
 # =========================
-NORM_PARQUET = Path("normalizeddata/swarm_dnsbpod_2018_normalized_DOY20-80.parquet")
-OUT_PNG      = Path("Figure/2D_residual_SWARM-B_DOY20-80.png")
+NORM_PARQUET = Path("normalizeddata/2018/swarm_dnsbpod_2018_normalized_DOY20-80.parquet")
+OUT_PNG      = Path("Figure/2018/2D_residual_SWARM-B_DOY20-80.png")
 
 T_START = "2018-01-20 00:00:00"   # DOY 20
 T_END   = "2018-03-21 23:59:59"   # DOY 80

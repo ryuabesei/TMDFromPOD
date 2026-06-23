@@ -7,7 +7,7 @@ residual_density_SWARM-A.py
     3. residual を左Y軸、COSMIC T(10 hPa) を右Y軸に重ねてプロット
 
 出力:
-    Figure/residual_density_SWARM-A.png
+    Figure/2018/residual_density_SWARM-A.png
 """
 
 from __future__ import annotations
@@ -22,9 +22,9 @@ import matplotlib.ticker as ticker
 # =========================
 # 設定
 # =========================
-NORM_PARQUET = Path("normalizeddata/swarm_dnsapod_2018_normalized.parquet")
+NORM_PARQUET = Path("normalizeddata/2018/swarm_dnsapod_2018_normalized.parquet")
 COSMIC_CSV   = Path("cosmic_T10hPa_daily_2018_DOY032_050_lat60_90N.csv")
-OUT_PNG      = Path("Figure/residual_density_SWARM-A.png")
+OUT_PNG      = Path("Figure/2018/residual_density_SWARM-A.png")
 
 DOY_START   = 36
 DOY_END     = 52

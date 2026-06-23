@@ -3,9 +3,9 @@ import numpy as np
 
 def main():
     print("Loading Swarm-A data...")
-    df_a = pd.read_parquet("normalizeddata/swarm_dnsapod_2018_normalized_DOY20-80.parquet")
+    df_a = pd.read_parquet("normalizeddata/2018/swarm_dnsapod_2018_normalized_DOY20-80.parquet")
     print("Loading Swarm-C data...")
-    df_c = pd.read_parquet("normalizeddata/swarm_dnscpod_2018_normalized_DOY20-80.parquet")
+    df_c = pd.read_parquet("normalizeddata/2018/swarm_dnscpod_2018_normalized_DOY20-80.parquet")
     
     # Filter for the same time period and lat
     df_a["datetime"] = pd.to_datetime(df_a["datetime"], utc=True)

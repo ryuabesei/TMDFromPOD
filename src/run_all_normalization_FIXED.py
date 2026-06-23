@@ -21,26 +21,26 @@ KPINDEX_CSV = Path("data/Kpindex/SW-20180120_20180320.csv")
 
 JOBS = [
     dict(
-        swarm_parquet = Path("integrateddata/swarm_dnsapod_2018_DOY20-80.parquet"),
-        out_parquet   = Path("normalizeddata/swarm_dnsapod_2018_normalized_DOY20-80.parquet"),
+        swarm_parquet = Path("integrateddata/2018/swarm_dnsapod_2018_DOY20-80.parquet"),
+        out_parquet   = Path("normalizeddata/2018/swarm_dnsapod_2018_normalized_DOY20-80.parquet"),
         alt_ref_km    = 450.0,
         label         = "SWARM-A DOY20-80",
     ),
     dict(
-        swarm_parquet = Path("integrateddata/swarm_dnsbpod_2018_DOY20-80.parquet"),
-        out_parquet   = Path("normalizeddata/swarm_dnsbpod_2018_normalized_DOY20-80.parquet"),
+        swarm_parquet = Path("integrateddata/2018/swarm_dnsbpod_2018_DOY20-80.parquet"),
+        out_parquet   = Path("normalizeddata/2018/swarm_dnsbpod_2018_normalized_DOY20-80.parquet"),
         alt_ref_km    = 450.0,
         label         = "SWARM-B DOY20-80 (alt_ref=450km)",
     ),
     dict(
-        swarm_parquet = Path("integrateddata/swarm_dnsbpod_2018_DOY20-80.parquet"),
-        out_parquet   = Path("normalizeddata/swarm_dnsbpod_2018_normalized_DOY20-80(450km).parquet"),
+        swarm_parquet = Path("integrateddata/2018/swarm_dnsbpod_2018_DOY20-80.parquet"),
+        out_parquet   = Path("normalizeddata/2018/swarm_dnsbpod_2018_normalized_DOY20-80(450km).parquet"),
         alt_ref_km    = 450.0,
         label         = "SWARM-B DOY20-80 (450km parquet)",
     ),
     dict(
-        swarm_parquet = Path("integrateddata/swarm_dnscpod_2018_DOY20-80.parquet"),
-        out_parquet   = Path("normalizeddata/swarm_dnscpod_2018_normalized_DOY20-80.parquet"),
+        swarm_parquet = Path("integrateddata/2018/swarm_dnscpod_2018_DOY20-80.parquet"),
+        out_parquet   = Path("normalizeddata/2018/swarm_dnscpod_2018_normalized_DOY20-80.parquet"),
         alt_ref_km    = 450.0,
         label         = "SWARM-C DOY20-80",
     ),

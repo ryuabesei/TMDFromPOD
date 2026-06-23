@@ -9,7 +9,7 @@ from pymsis import msis
 # =========================
 # 入力
 # =========================
-PARQUET_PATH = Path("normalizeddata/swarm_dnsapod_2018_normalized.parquet")
+PARQUET_PATH = Path("normalizeddata/2018/swarm_dnsapod_2018_normalized.parquet")
 
 START_DATE = "2018-02-05"
 END_DATE   = "2018-02-21"

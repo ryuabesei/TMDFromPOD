@@ -2,8 +2,8 @@
 plot_density_before_after_normalization.py
 
 目的:
-    正規化前（integrateddata/swarm_dnsapod_2018.parquet）と
-    正規化後（normalizeddata/swarm_dnsapod_2018_normalized.parquet）の
+    正規化前（integrateddata/2018/swarm_dnsapod_2018.parquet）と
+    正規化後（normalizeddata/2018/swarm_dnsapod_2018_normalized.parquet）の
     2D密度分布（緯度 × DoY）を左右に並べて比較する。
 
 参考図に合わせた点:
@@ -24,8 +24,8 @@ from pathlib import Path
 # =========================
 # 設定
 # =========================
-RAW_PARQUET = Path("integrateddata/swarm_dnsbpod_2018.parquet")
-NORM_PARQUET = Path("normalizeddata/swarm_dnsbpod_2018_normalized(450km).parquet")
+RAW_PARQUET = Path("integrateddata/2018/swarm_dnsbpod_2018.parquet")
+NORM_PARQUET = Path("normalizeddata/2018/swarm_dnsbpod_2018_normalized(450km).parquet")
 OUT_PNG = Path("figures/swarm_dnsbpod_2018_before_after_normalization(450km).png")
 
 T_START = "2018-02-05 00:00:00"
