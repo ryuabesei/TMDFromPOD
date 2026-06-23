@@ -187,7 +187,8 @@ def load_geo_data(kpindex_csv: Path) -> tuple[pd.DataFrame, pd.DataFrame, pd.Dat
 def normalize(swarm_parquet: Path,
               kpindex_csv: Path,
               out_parquet: Path,
-              alt_ref_km: float = ALT_REF_KM) -> None:
+              alt_ref_km: float = ALT_REF_KM,
+              out_parquet_lt_removed: Path | None = None) -> None:
 
     print(f"\n{'='*60}")
     print(f"正規化開始: {swarm_parquet.name}")
@@ -276,16 +277,35 @@ def normalize(swarm_parquet: Path,
 
     # ---------- 正規化 ----------
     ratio = rho_model_ref / rho_model_real
-    df["density_norm"] = rho_obs * ratio
+    df["density_norm"]                  = rho_obs * ratio
     df["norm_ratio_model_ref_over_real"] = ratio
-    df["norm_ref_alt_km"]  = alt_ref_km
-    df["norm_ref_F107"]    = F107_REF
-    df["norm_ref_AP"]      = AP_REF
+    df["norm_ref_alt_km"]               = alt_ref_km
+    df["norm_ref_F107"]                 = F107_REF
+    df["norm_ref_AP"]                   = AP_REF
 
-    # ---------- 出力 ----------
+    # ---------- LT依存除去列 ----------
+    # rho_model_real: 観測時刻・位置・高度・実F10.7/Ap条件のMSIS密度
+    # rho_model_ref : 基準高度・基準F10.7/Ap条件のMSIS密度（density_norm用）
+    df["rho_model_real"]        = rho_model_real
+    df["rho_model_ref"]         = rho_model_ref
+    df["density_ratio_msis"]    = rho_obs / rho_model_real
+    df["density_residual_msis"] = (rho_obs - rho_model_real) / rho_model_real
+
+    # ---------- 統計サマリ ----------
+    print(df[[
+        "density_norm",
+        "density_ratio_msis",
+        "density_residual_msis",
+    ]].describe().to_string())
+
+    # ---------- 出力（既存） ----------
     ensure_dir(out_parquet)
     df.to_parquet(out_parquet, index=False)
-
     print(f"  ✅ 保存完了: {out_parquet}")
     print(f"  行数: {len(df):,}  |  ratio: {ratio.min():.3f}〜{ratio.max():.3f}")
-    print(f"  density_norm: {df['density_norm'].describe().to_dict()}")
+
+    # ---------- 出力（LT除去版・オプション） ----------
+    if out_parquet_lt_removed is not None:
+        ensure_dir(out_parquet_lt_removed)
+        df.to_parquet(out_parquet_lt_removed, index=False)
+        print(f"  ✅ LT除去版 保存完了: {out_parquet_lt_removed}")

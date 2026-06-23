@@ -17,31 +17,35 @@ KPINDEX_CSV = Path("data/SSW2019/Kpindex/SW-All_2019-09-09_to_2019-09-23.csv")
 JOBS = [
     # --- SWARM-A ---
     dict(
-        swarm_parquet = Path("integrateddata/2019/swarm_dnsapod_2019_SSW.parquet"),
-        out_parquet   = Path("normalizeddata/2019/swarm_dnsapod_2019_normalized_SSW.parquet"),
-        alt_ref_km    = 450.0,
-        label         = "SWARM-A 2019 SSW (alt_ref=450km)",
+        swarm_parquet          = Path("integrateddata/2019/swarm_dnsapod_2019_SSW.parquet"),
+        out_parquet            = Path("normalizeddata/2019/swarm_dnsapod_2019_normalized_SSW.parquet"),
+        out_parquet_lt_removed = Path("normalizeddata/2019/swarm_dnsapod_2019_normalized_with_LT_removed_SSW.parquet"),
+        alt_ref_km             = 450.0,
+        label                  = "SWARM-A 2019 SSW (alt_ref=450km)",
     ),
     # --- SWARM-B (標準 510km) ---
     dict(
-        swarm_parquet = Path("integrateddata/2019/swarm_dnsbpod_2019_SSW.parquet"),
-        out_parquet   = Path("normalizeddata/2019/swarm_dnsbpod_2019_normalized_SSW.parquet"),
-        alt_ref_km    = 510.0,
-        label         = "SWARM-B 2019 SSW (alt_ref=510km)",
+        swarm_parquet          = Path("integrateddata/2019/swarm_dnsbpod_2019_SSW.parquet"),
+        out_parquet            = Path("normalizeddata/2019/swarm_dnsbpod_2019_normalized_SSW.parquet"),
+        out_parquet_lt_removed = Path("normalizeddata/2019/swarm_dnsbpod_2019_normalized_with_LT_removed_SSW.parquet"),
+        alt_ref_km             = 510.0,
+        label                  = "SWARM-B 2019 SSW (alt_ref=510km)",
     ),
     # --- SWARM-B (比較用 450km) ---
     dict(
-        swarm_parquet = Path("integrateddata/2019/swarm_dnsbpod_2019_SSW.parquet"),
-        out_parquet   = Path("normalizeddata/2019/swarm_dnsbpod_2019_normalized_SSW(450km).parquet"),
-        alt_ref_km    = 450.0,
-        label         = "SWARM-B 2019 SSW (alt_ref=450km)",
+        swarm_parquet          = Path("integrateddata/2019/swarm_dnsbpod_2019_SSW.parquet"),
+        out_parquet            = Path("normalizeddata/2019/swarm_dnsbpod_2019_normalized_SSW(450km).parquet"),
+        out_parquet_lt_removed = Path("normalizeddata/2019/swarm_dnsbpod_2019_normalized_with_LT_removed_SSW(450km).parquet"),
+        alt_ref_km             = 450.0,
+        label                  = "SWARM-B 2019 SSW (alt_ref=450km)",
     ),
     # --- SWARM-C ---
     dict(
-        swarm_parquet = Path("integrateddata/2019/swarm_dnscpod_2019_SSW.parquet"),
-        out_parquet   = Path("normalizeddata/2019/swarm_dnscpod_2019_normalized_SSW.parquet"),
-        alt_ref_km    = 450.0,
-        label         = "SWARM-C 2019 SSW (alt_ref=450km)",
+        swarm_parquet          = Path("integrateddata/2019/swarm_dnscpod_2019_SSW.parquet"),
+        out_parquet            = Path("normalizeddata/2019/swarm_dnscpod_2019_normalized_SSW.parquet"),
+        out_parquet_lt_removed = Path("normalizeddata/2019/swarm_dnscpod_2019_normalized_with_LT_removed_SSW.parquet"),
+        alt_ref_km             = 450.0,
+        label                  = "SWARM-C 2019 SSW (alt_ref=450km)",
     ),
 ]
 
@@ -53,10 +57,11 @@ if __name__ == "__main__":
     for job in JOBS:
         print(f"\n>>> Running job: {job['label']}")
         normalize(
-            swarm_parquet = job["swarm_parquet"],
-            kpindex_csv   = KPINDEX_CSV,
-            out_parquet   = job["out_parquet"],
-            alt_ref_km    = job["alt_ref_km"],
+            swarm_parquet          = job["swarm_parquet"],
+            kpindex_csv            = KPINDEX_CSV,
+            out_parquet            = job["out_parquet"],
+            alt_ref_km             = job["alt_ref_km"],
+            out_parquet_lt_removed = job["out_parquet_lt_removed"],
         )
 
     print("\n" + "="*60)
