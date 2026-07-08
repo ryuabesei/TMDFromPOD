@@ -171,8 +171,7 @@ def main() -> None:
             ax.set_xticks(range(DOY_START, DOY_END + 1, 5))
             ax.grid(axis="y", alpha=0.3, linewidth=0.7)
 
-            # 左軸ラベルは左端カラムのみ、ただし目盛り数字は全カラムで表示
-            ax.tick_params(axis="y", labelleft=True)
+            # 左軸ラベルは左端カラムのみ
             if col_idx == 0:
                 ax.set_ylabel("Δratio (ratio − ref)", fontsize=10)
 
@@ -208,6 +207,66 @@ def main() -> None:
     fig.savefig(OUT_PNG, dpi=150, bbox_inches="tight")
     print(f"\n  Saved: {OUT_PNG}")
     plt.close(fig)
+
+
+if __name__ == "__main__":
+    main()
+                      resid.to_numpy(dtype=float),
+                      color=color, linewidth=2.0, marker="o", markersize=4, zorder=4)
+            _add_cosmic(ax_d, cosmic_T10, show_ylabel=show_cosmic_ylabel)
+
+            if col_idx == 0:
+                ax_d.set_ylabel(f"{band_label.strip()}\nΔratio\n(ratio−ref)", fontsize=8)
+
+            if not np.isnan(ref):
+                ax_d.text(0.99, 0.97, f"ref={ref:.3f}",
+                          transform=ax_d.transAxes, fontsize=7,
+                          va="top", ha="right", color="gray")
+
+            ax_d.text(0.01, 0.97, band_label.strip(),
+                      transform=ax_d.transAxes, fontsize=9,
+                      fontweight="bold", va="top", ha="left")
+
+            if bi == n_bands - 1:
+                ax_d.set_xlabel("Day of Year (2018)", fontsize=10)
+
+    # 凡例
+    lt_names = "   |   ".join(lt["label"] for lt in lt_sectors)
+    legend_elems = [
+        plt.Rectangle((0, 0), 1, 1, fc="lightblue",  alpha=0.4,
+                       label="Non-SSW ref (DOY 30-40, 61-65)"),
+        plt.Rectangle((0, 0), 1, 1, fc="lightyellow", alpha=0.6,
+                       label="SSW period (DOY 41-60)"),
+        plt.Line2D([0], [0], color="hotpink", lw=1.5, marker="s", ms=3,
+                   label=f"COSMIC T (10 hPa, {COSMIC_LAT_LABEL})"),
+    ]
+    fig.legend(handles=legend_elems,
+               loc="lower center", ncol=3, fontsize=9,
+               framealpha=0.85, bbox_to_anchor=(0.5, -0.02))
+
+    fig.suptitle(
+        f"{label}  2018 NH SSW  (DOY 30–65)\n"
+        f"{lt_names}\n"
+        "Top rows: ρ_ratio = daily median(ρ_obs/ρ_MSIS_real)   "
+        "Bottom rows: Δratio = ratio − median(non-SSW ref)",
+        fontsize=11, fontweight="bold", y=1.01,
+    )
+
+    out_png.parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(out_png, dpi=150, bbox_inches="tight")
+    print(f"  Saved: {out_png}")
+    plt.close(fig)
+
+
+# ============================================================
+# Main
+# ============================================================
+def main() -> None:
+    print("Loading COSMIC T(10 hPa) ...")
+    cosmic_T10 = load_cosmic_T10(COSMIC_CSV)
+    for sat in SATELLITES:
+        plot_satellite(sat, cosmic_T10)
+    print("\nDone.")
 
 
 if __name__ == "__main__":

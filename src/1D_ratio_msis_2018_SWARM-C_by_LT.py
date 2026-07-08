@@ -130,7 +130,6 @@ def main() -> None:
             ax.set_xlim(x_min, x_max)
             ax.set_xticks(range(DOY_START, DOY_END + 1, 5))
             ax.grid(axis="y", alpha=0.3, linewidth=0.7)
-            ax.tick_params(axis="y", labelleft=True)
             if col_idx == 0:
                 ax.set_ylabel("Δratio (ratio − ref)", fontsize=10)
             ax.text(0.01, 0.97, band_label.strip(), transform=ax.transAxes,
