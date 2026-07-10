@@ -6,14 +6,19 @@ Purpose:
     split by LT sector for SWARM-C and GRACE-FO during the 2021 NH SSW (2020-12-25 to 2021-02-05).
 
     LT sectors are defined dynamically per satellite to avoid data gaps due to precession:
-        SWARM-C:  Dawn (LT 4.5–10.5 h) / Dusk (LT 16.5–22.5 h)
-        GRACE-FO: Night/Dawn (LT 0.0–10.5 h) / Day/Dusk (LT 12.0–22.5 h)
+        SWARM-C:  Fixed windows — Dawn (LT 4.5–10.5 h) / Dusk (LT 16.5–22.5 h)
+        GRACE-FO: DYNAMIC — two orbital planes always ~12 h apart, both drifting together:
+                    Plane A (lower-LT side):  ~1 h (Dec 28) → ~10 h (Feb 5)  [Night → Morning]
+                    Plane B (higher-LT side): ~13 h (Dec 28) → ~22 h (Feb 5)  [Afternoon → Night]
+                  Each day, observations are split at the daily LT mid-gap (the valley between
+                  the two orbit-plane clusters), so that Plane A and Plane B are tracked
+                  consistently throughout the drift.
 
     Layout per satellite: 3 rows (latitude bands) x 2 columns (LT sectors)
 
 Output:
     Figure/2021/1D_ratio_with_temp_2021_SWARM-C_by_LT.png
-    Figure/2021/1D_ratio_with_temp_2021_GRACE-FO.png
+    Figure/2021/1D_ratio_with_temp_2021_GRACE-FO_by_LT.png
 """
 
 from __future__ import annotations
@@ -29,9 +34,10 @@ LT_SWARM = [
     dict(label="Dusk (LT 16.5–22.5 h)", lt_min=16.5, lt_max=22.5, color="#e07b39"),
 ]
 
+# GRACE-FO: dynamic mode (lt_min/lt_max are ignored at plot time; use dynamic=True)
 LT_GRACE = [
-    dict(label="Night/Dawn (LT 0.0–10.5 h)", lt_min=0.0,  lt_max=10.5,  color="#1a6faf"),
-    dict(label="Day/Dusk (LT 12.0–22.5 h)",   lt_min=12.0, lt_max=22.5, color="#e07b39"),
+    dict(label="Orbital Plane A (lower LT)",  plane="A", color="#1a6faf", dynamic=True),
+    dict(label="Orbital Plane B (higher LT)", plane="B", color="#e07b39", dynamic=True),
 ]
 
 SATELLITES = [
@@ -80,6 +86,102 @@ def get_ref_median(daily: pd.Series) -> float:
         return np.nan
     return float(daily[mask].median())
 
+
+def assign_orbital_plane(df: pd.DataFrame, lat_col: str) -> pd.DataFrame:
+    """Dynamically classify each observation into Orbital Plane A (lower LT) or B (higher LT).
+
+    GRACE-FO always has two orbit planes ~12 h apart in LT. Both drift together at ~0.08 h/day.
+    Each day we find the mid-gap between the two clusters (the valley in the bimodal LT histogram)
+    and split observations there.
+
+    Step 1 – Initial split (per day):
+        midpoint = (25th-pct + 75th-pct) / 2
+        Plane A: lst_h < midpoint  (lower LT side)
+        Plane B: lst_h >= midpoint (higher LT side)
+
+    Step 2 – Continuity fix (0/24 h wraparound):
+        When Plane A crosses midnight (e.g. 0.044 h → 23.96 h the next day),
+        the initial split assigns the newly-lower cluster (~12 h) as A and the
+        wrapped cluster (~24 h) as B — physically swapping the labels.
+        We detect this by monitoring the day-to-day jump in Plane-A median LT.
+        A jump > 6 h triggers a label swap for that day onward, restoring
+        consistent tracking of the same physical orbit throughout the period.
+    """
+    df = df.copy()
+    df["orbital_plane"] = "A"   # default
+
+    for date, grp in df.groupby("date"):
+        p25 = grp["lst_h"].quantile(0.25)
+        p75 = grp["lst_h"].quantile(0.75)
+        midpoint = (p25 + p75) / 2.0
+        # On transition days the spread may be huge; use 12 as the canonical split
+        # if the two clusters are within 3 h of each other (degenerate)
+        if abs(p75 - p25) < 3.0:
+            midpoint = 12.0
+        plane_b_mask = grp["lst_h"] >= midpoint
+        df.loc[grp.index[plane_b_mask], "orbital_plane"] = "B"
+
+    # ----------------------------------------------------------------
+    # Continuity fix: track physical orbital planes across 0/24 h boundary.
+    #
+    # Each day has two LT clusters ~12 h apart. The algorithm above labels
+    # the lower-LT cluster "A" and the higher-LT cluster "B". When Plane A
+    # drifts past midnight (0h), the clusters wrap: Plane A reappears at ~24h
+    # which is labeled "B" by the above step, causing a physical swap.
+    #
+    # Fix: for each day, compute the circular distance from the previous
+    # day's corrected Plane-A median to each of the two current clusters.
+    # Assign whichever cluster is closer (circularly) to be the new Plane A.
+    # This guarantees continuous tracking of the same physical orbit.
+    # ----------------------------------------------------------------
+    def circ_dist(a: float, b: float, period: float = 24.0) -> float:
+        d = abs(a - b) % period
+        return min(d, period - d)
+
+    dates_sorted = sorted(df["date"].unique())
+
+    # Compute initial per-day cluster medians (before any swap correction)
+    init_a = df[df["orbital_plane"] == "A"].groupby("date")["lst_h"].median()
+    init_b = df[df["orbital_plane"] == "B"].groupby("date")["lst_h"].median()
+
+    # Start tracking from day 0 (no correction needed on first day)
+    corrected_a_prev = init_a.get(dates_sorted[0], np.nan)
+
+    for i in range(1, len(dates_sorted)):
+        curr_date = dates_sorted[i]
+        curr_a0 = init_a.get(curr_date, np.nan)
+        curr_b0 = init_b.get(curr_date, np.nan)
+
+        if np.isnan(corrected_a_prev) or np.isnan(curr_a0) or np.isnan(curr_b0):
+            corrected_a_prev = curr_a0
+            continue
+
+        dist_to_a = circ_dist(corrected_a_prev, curr_a0)
+        dist_to_b = circ_dist(corrected_a_prev, curr_b0)
+
+        if dist_to_b < dist_to_a:
+            # Cluster B is actually the continuation of Plane A — swap labels
+            mask = df["date"] == curr_date
+            df.loc[mask & (df["orbital_plane"] == "A"), "orbital_plane"] = "_tmp"
+            df.loc[mask & (df["orbital_plane"] == "B"), "orbital_plane"] = "A"
+            df.loc[mask & (df["orbital_plane"] == "_tmp"), "orbital_plane"] = "B"
+            corrected_a_prev = curr_b0
+            print(f"    [wrap-fix] Plane-A → cluster B on {curr_date.date()}: "
+                  f"prev_A={corrected_a_prev:.3f}h  clust_A={curr_a0:.3f}h  clust_B={curr_b0:.3f}h  "
+                  f"(dist_A={dist_to_a:.2f} dist_B={dist_to_b:.2f}) → SWAPPED")
+        else:
+            corrected_a_prev = curr_a0
+
+    # Diagnostics: report daily medians after continuity fix
+    daily_lt_a_final = df[df["orbital_plane"] == "A"].groupby("date")["lst_h"].median().rename("LT_A_med")
+    daily_lt_b_final = df[df["orbital_plane"] == "B"].groupby("date")["lst_h"].median().rename("LT_B_med")
+    diag = pd.concat([daily_lt_a_final, daily_lt_b_final], axis=1)
+    print("  Daily LT after continuity fix (Plane-A | Plane-B):")
+
+    print(diag.to_string())
+    return df
+
+
 def load_era5_temp() -> pd.Series:
     era5_dir = Path("data/SSW2021/ERA5")
     files = sorted(list(era5_dir.glob("*.nc")))
@@ -110,6 +212,7 @@ def plot_satellite(sat: dict, df_temp: pd.Series) -> None:
     parquet    = sat["parquet"]
     out_png    = sat["out_png"]
     lt_sectors = sat["lt_sectors"]
+    use_dynamic = lt_sectors[0].get("dynamic", False)
 
     print(f"\n=== {label} ===")
     df = pd.read_parquet(parquet)
@@ -119,6 +222,11 @@ def plot_satellite(sat: dict, df_temp: pd.Series) -> None:
     df = df[(df["datetime"] >= DATE_START) & (df["datetime"] <= DATE_END + pd.Timedelta(hours=23, minutes=59))]
     df["date"] = df["datetime"].dt.normalize()
     print(f"  {len(df):,} rows loaded after filtering")
+
+    # GRACE-FO: assign dynamic orbital planes before plotting
+    if use_dynamic:
+        print("  [GRACE-FO] Assigning orbital planes dynamically ...")
+        df = assign_orbital_plane(df, lat_col)
 
     n_bands = len(LAT_BANDS)
     n_lt    = len(lt_sectors)
@@ -130,12 +238,20 @@ def plot_satellite(sat: dict, df_temp: pd.Series) -> None:
 
     for col_idx, lt in enumerate(lt_sectors):
         lt_label = lt["label"]
-        lt_min   = lt["lt_min"]
-        lt_max   = lt["lt_max"]
         color    = lt["color"]
 
-        df_lt = df[(df["lst_h"] >= lt_min) & (df["lst_h"] < lt_max)]
-        print(f"  {lt_label}: {len(df_lt):,} obs")
+        if use_dynamic:
+            plane_key = lt["plane"]
+            df_lt = df[df["orbital_plane"] == plane_key]
+            # Build an informative title showing LT range at start & end of period
+            lt_start = df_lt[df_lt["date"] == df_lt["date"].min()]["lst_h"].median()
+            lt_end   = df_lt[df_lt["date"] == df_lt["date"].max()]["lst_h"].median()
+            lt_label = f"{lt['label']}\n(LT {lt_start:.1f}h→{lt_end:.1f}h)"
+        else:
+            lt_min = lt["lt_min"]
+            lt_max = lt["lt_max"]
+            df_lt = df[(df["lst_h"] >= lt_min) & (df["lst_h"] < lt_max)]
+        print(f"  {lt_label.splitlines()[0]}: {len(df_lt):,} obs")
 
         for bi, (band_label, lat_lo, lat_hi) in enumerate(LAT_BANDS):
             ax = axes[bi, col_idx]
