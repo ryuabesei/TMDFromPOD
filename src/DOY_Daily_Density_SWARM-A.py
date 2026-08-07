@@ -54,7 +54,8 @@ result = msis.run(
     alts,
     f107,
     f107a,
-    ap
+    ap,
+    version=2.1
 )
 
 df_period["rho_msis"] = result[:,0]

@@ -141,7 +141,7 @@ def build_ap7_matrix_fixed(df: pd.DataFrame) -> np.ndarray:
 def msis_density(time_utc, lat, lon, alt_km, f107s, f107as, aps) -> np.ndarray:
     from pymsis import msis
     out = msis.run(time_utc, lon, lat, alt_km,
-                   f107s=f107s, f107as=f107as, aps=aps)
+                   f107s=f107s, f107as=f107as, aps=aps, version=2.1)
     out = np.asarray(out)
     if DEBUG_PRINT_MSIS_SHAPE:
         print("MSIS out shape:", out.shape)

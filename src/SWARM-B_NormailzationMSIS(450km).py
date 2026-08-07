@@ -205,7 +205,8 @@ def msis_density(time_utc: np.ndarray,
         alt_km,     # alts [km]
         f107s=f107s,
         f107as=f107as,
-        aps=aps
+        aps=aps,
+        version=2.1
     )
 
     out = np.asarray(out)

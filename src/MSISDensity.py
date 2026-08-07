@@ -49,7 +49,8 @@ def compute_msis_ref_density(df: pd.DataFrame) -> np.ndarray:
         alt_km,
         f107s=f107s,
         f107as=f107as,
-        aps=aps
+        aps=aps,
+        version=2.1
     )
 
     out = np.asarray(out)

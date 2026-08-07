@@ -84,7 +84,7 @@ def main():
     f107a = np.full(N, F107_REF)
     ap    = np.full((N, 7), AP_REF)
     
-    result = msis.run(times, lons, lats, alts, f107, f107a, ap)
+    result = msis.run(times, lons, lats, alts, f107, f107a, ap, version=2.1)
     df_norm["rho_msis"] = result[:, 0]
     
     # Filter by sectors
