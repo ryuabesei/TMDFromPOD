@@ -170,7 +170,7 @@ def compute_2d_grid(
 # ─── Single-event plot ────────────────────────────────────────────────────────
 def plot_event(ev: dict) -> None:
     year    = ev["year"]
-    out_png = OUT_DIR / f"2D_detrend_only_temp_ap_{year}.png"
+    out_png = OUT_DIR / ev.get("output_name", f"2D_detrend_only_temp_ap_{year}.png")
     print(f"Processing {ev['label']}...")
 
     df = load_density(ev)
@@ -234,17 +234,19 @@ def plot_event(ev: dict) -> None:
     ax_a.set_ylabel("Ap Index", color="#e67e22", fontweight="bold")
     ax_a.tick_params(axis="y", labelcolor="#e67e22")
 
-    # SSW peak line + label pinned to top of panel
-    ax1d.axvline(ev["ssw_peak"], color="red", ls="--", lw=1.8)
-    trans = mtransforms.blended_transform_factory(ax1d.transData, ax1d.transAxes)
-    ax1d.text(
-        ev["ssw_peak"], 0.97,
-        f" {ev['ssw_peak_label']}",
-        transform=trans,
-        color="red", fontweight="bold",
-        verticalalignment="top", fontsize=8.5,
-        bbox=dict(boxstyle="round,pad=0.2", fc="white", ec="red", alpha=0.85),
-    )
+    # SSW peak line + label pinned to top of panel. It can be disabled for a
+    # deliberately event-free reference window without changing event plots.
+    if ev.get("show_ssw_marker", True):
+        ax1d.axvline(ev["ssw_peak"], color="red", ls="--", lw=1.8)
+        trans = mtransforms.blended_transform_factory(ax1d.transData, ax1d.transAxes)
+        ax1d.text(
+            ev["ssw_peak"], 0.97,
+            f" {ev['ssw_peak_label']}",
+            transform=trans,
+            color="red", fontweight="bold",
+            verticalalignment="top", fontsize=8.5,
+            bbox=dict(boxstyle="round,pad=0.2", fc="white", ec="red", alpha=0.85),
+        )
 
     ann_text = f"slope a={slope:.5f}  intercept b={intercept:.5f}  corr(y,Ap)={r:.3f}"
     ax1d.text(0.015, 0.88, ann_text, transform=ax1d.transAxes,
@@ -278,7 +280,8 @@ def plot_event(ev: dict) -> None:
     ax2d_detrend.contour(X_centers, Y_centers, Z_detrend,
                          levels=[-0.1, 0.1], colors="gray", linewidths=0.6, linestyles="--", alpha=0.4)
 
-    ax2d_detrend.axvline(mdates.date2num(ev["ssw_peak"]), color="red", ls="--", lw=1.8)
+    if ev.get("show_ssw_marker", True):
+        ax2d_detrend.axvline(mdates.date2num(ev["ssw_peak"]), color="red", ls="--", lw=1.8)
     ax2d_detrend.axhline(0, color="gray", ls=":", lw=1.0, alpha=0.7)
     ax2d_detrend.set_ylabel("Latitude [deg]", fontweight="bold")
     ax2d_detrend.set_ylim(LAT_MIN, LAT_MAX)
