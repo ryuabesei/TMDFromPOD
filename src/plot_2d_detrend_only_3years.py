@@ -40,7 +40,7 @@ LAT_BIN = 3.0
 EVENTS = [
     dict(
         year=2018,
-        label="2018 NH SSW (SWARM-A)",
+        label="2017/2018 NH SSW (SWARM-A)",
         parquet=P2018,
         date_start=pd.Timestamp("2018-01-30", tz="UTC"),
         date_end=pd.Timestamp("2018-03-06 23:59:59", tz="UTC"),
@@ -77,7 +77,7 @@ EVENTS = [
     ),
     dict(
         year=2021,
-        label="2021 NH SSW (SWARM-C)",
+        label="2020/2021 NH SSW (SWARM-C)",
         parquet=P2021,
         date_start=pd.Timestamp("2020-12-25", tz="UTC"),
         date_end=pd.Timestamp("2021-02-05 23:59:59", tz="UTC"),

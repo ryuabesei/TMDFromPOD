@@ -39,7 +39,7 @@ EVENTS = [
     # ── 2018 NH SSW SWARM-B ──────────────────────────────────────────────────
     dict(
         year=2018, sat="SWARM-B",
-        label="2018 NH SSW (SWARM-B)",
+        label="2017/2018 NH SSW (SWARM-B)",
         parquet=Path("normalizeddata/2018/swarm_dnsbpod_2018_normalized_with_LT_removed_DOY20-80.parquet"),
         date_start=pd.Timestamp("2018-01-30", tz="UTC"),
         date_end=pd.Timestamp("2018-03-06 23:59:59", tz="UTC"),
@@ -59,7 +59,7 @@ EVENTS = [
     # ── 2018 NH SSW SWARM-C ──────────────────────────────────────────────────
     dict(
         year=2018, sat="SWARM-C",
-        label="2018 NH SSW (SWARM-C)",
+        label="2017/2018 NH SSW (SWARM-C)",
         parquet=Path("normalizeddata/2018/swarm_dnscpod_2018_normalized_with_LT_removed_DOY20-80.parquet"),
         date_start=pd.Timestamp("2018-01-30", tz="UTC"),
         date_end=pd.Timestamp("2018-03-06 23:59:59", tz="UTC"),
